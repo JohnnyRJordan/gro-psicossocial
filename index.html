@@ -550,29 +550,25 @@ tr:hover td{background:var(--grl)}
         <div class="rh-page" id="rh-page-compartilhar">
           <div class="card" style="background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border-color:#86EFAC">
             <div class="card-title" style="color:var(--gd);margin-bottom:6px">📤 Compartilhar questionário</div>
-            <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Cole a URL após publicar no Netlify para gerar o QR Code e o link de WhatsApp.</div>
-            <div class="share-url-row">
-              <input class="share-url-inp" id="share-url" type="text" placeholder="https://seu-app.netlify.app">
-              <button class="btn btn-g" onclick="updateQR()" style="white-space:nowrap">Gerar QR</button>
+            <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Envie o link do questionário para os colaboradores responderem pelo celular ou computador.</div>
+            <div style="background:#fff;border:1px solid var(--br);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;color:var(--gd);font-weight:500;flex:1" id="share-url-display">ornate-elf-a37d91.netlify.app</span>
+              <button class="btn btn-g" onclick="copyLink()" style="font-size:12px;padding:7px 14px">📋 Copiar link</button>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="btn" style="background:#25D366;color:#fff" onclick="shareWpp()">📱 WhatsApp</button>
-              <button class="btn btn-out" onclick="printQR()">🖨️ Imprimir QR</button>
+              <button class="btn" style="background:#25D366;color:#fff" onclick="shareWpp()">📱 Enviar por WhatsApp</button>
+              <button class="btn btn-g" onclick="updateQR()">🔲 Gerar QR Code</button>
+              <button class="btn btn-out" onclick="printQR()" id="btn-print-qr" style="display:none">🖨️ Imprimir QR</button>
               <button class="btn btn-out" onclick="dlQR()" id="btn-dl-qr" style="display:none">⬇ Baixar QR</button>
             </div>
+            <input id="share-url" type="hidden" value="">
           </div>
-          <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:12px">
-            <div class="qr-wrap" id="qr-wrap">
-              <div id="qr-container"></div>
-              <div style="font-size:12px;color:var(--t3);text-align:center;max-width:220px" id="qr-lbl">Informe a URL acima e clique em "Gerar QR"</div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title" style="margin-bottom:12px">Como publicar no Netlify (gratuito)</div>
-            <div class="g3">
-              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">1️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Acesse app.netlify.com/drop</div><div style="font-size:12px;color:var(--t2)">No computador</div></div>
-              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">2️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Arraste a pasta do app</div><div style="font-size:12px;color:var(--t2)">A pasta com index.html</div></div>
-              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">3️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Cole o link gerado</div><div style="font-size:12px;color:var(--t2)">No campo acima</div></div>
+          <div id="qr-section" style="display:none">
+            <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+              <div class="qr-wrap" id="qr-wrap">
+                <div id="qr-container"></div>
+                <div style="font-size:12px;color:var(--t3);text-align:center;max-width:220px" id="qr-lbl"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -814,7 +810,7 @@ function showLogin(){showScreen('login');setTimeout(()=>document.getElementById(
 async function doLogin(){
   const pw = document.getElementById('login-pw').value;
   const perfil = document.getElementById('login-perfil')?.value || 'rh';
-  const empresaId = document.getElementById('login-empresa')?.value || 1;
+  const empresaId = 1; // Empresa padrão — expandir para multi-empresa futuramente
   const err = document.getElementById('login-err');
 
   try {
@@ -1276,27 +1272,40 @@ async function delRelato(i){
 // ══════════════════════════════════════════════
 // QR CODE
 // ══════════════════════════════════════════════
+function getAppUrl(){
+  return window.location.origin + '/';
+}
+function copyLink(){
+  const url = getAppUrl();
+  navigator.clipboard.writeText(url).then(()=>{
+    alert('Link copiado: '+url);
+  }).catch(()=>{
+    prompt('Copie o link:', url);
+  });
+}
 function updateQR(){
-  const url=document.getElementById('share-url').value.trim();
-  if(!url){alert('Informe a URL');return;}
+  const url = getAppUrl();
+  document.getElementById('share-url').value = url;
   const c=document.getElementById('qr-container');c.innerHTML='';
   try{
-    new QRCode(c,{text:url,width:200,height:200,colorDark:'#161510',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    document.getElementById('qr-lbl').textContent='QR Code gerado. Aponte a câmera para ler.';
+    new QRCode(c,{text:url,width:220,height:220,colorDark:'#161510',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+    document.getElementById('qr-lbl').textContent='Aponte a câmera do celular para acessar o questionário.';
     document.getElementById('btn-dl-qr').style.display='inline-flex';
+    document.getElementById('btn-print-qr').style.display='inline-flex';
+    document.getElementById('qr-section').style.display='block';
   }catch(e){c.innerHTML='<div style="color:var(--rd);font-size:13px">Erro ao gerar QR.</div>';}
 }
 function shareWpp(){
-  const url=document.getElementById('share-url').value.trim();
+  const url = getAppUrl();
   const msg=encodeURIComponent('Olá! Por favor, responda o questionário de riscos psicossociais da nossa empresa (NR-1). É anônimo e leva ~12 minutos:\n\n'+url);
   window.open('https://wa.me/?text='+msg,'_blank');
 }
 function printQR(){
   const canvas=document.querySelector('#qr-container canvas');
-  if(!canvas){alert('Gere o QR Code primeiro.');return;}
-  const url=document.getElementById('share-url').value.trim();
+  if(!canvas){updateQR();setTimeout(printQR,500);return;}
+  const url=getAppUrl();
   const w=window.open('','_blank');
-  w.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;gap:14px;padding:40px"><h2 style="color:#0F6E56">GRO Psicossocial — NR-1</h2><p>Avaliação de Riscos Psicossociais — responda o questionário:</p><img src="${canvas.toDataURL()}" style="width:240px;height:240px"><p style="font-size:13px;color:#666">${url}</p></body></html>`);
+  w.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;gap:14px;padding:40px"><h2 style="color:#0F6E56">GRO Psicossocial — NR-1</h2><p>Responda o questionário de riscos psicossociais:</p><img src="${canvas.toDataURL()}" style="width:240px;height:240px"><p style="font-size:13px;color:#666">${url}</p></body></html>`);
   w.document.close();w.print();
 }
 function dlQR(){
@@ -1411,21 +1420,28 @@ function printPDF(){
 // INIT
 // ══════════════════════════════════════════════
 document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-try{document.getElementById('share-url').value=window.location.origin+'/';}catch(e){}
+try{
+  const appUrl = window.location.origin+'/';
+  const el = document.getElementById('share-url-display');
+  if(el) el.textContent = appUrl.replace('https://','');
+}catch(e){}
 
-// Inicializa banco de dados
-initDB();
+// Inicializa banco de dados e cria usuários padrão
+fetch('/api/db-init').then(r=>r.json()).then(d=>{
+  if(d.ok) {
+    // Cria usuários padrão RH e SST para empresa 1
+    fetch('/api/auth?action=setup', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({empresaId:1, senhaRH:'rh1234', senhaSSTResult:'sst1234'})
+    }).catch(()=>{});
+  }
+}).catch(()=>{});
 
-// Se já tem token válido, vai direto para o painel
-if (TOKEN && PERFIL) {
-  loadData().then(() => {
-    showScreen('rh');
-    renderDashboard();
-    atualizaMenuPerfil();
-    document.getElementById('rh-page-title').textContent='Dashboard';
-    document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-  });
-}
+// Sempre começa na tela do colaborador — login é explícito
+showScreen('colab');
+// Limpa token antigo ao iniciar
+clearToken();
 
 // PWA banner iOS
 window.addEventListener('load',()=>{
