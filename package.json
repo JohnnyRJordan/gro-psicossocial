@@ -1,0 +1,8 @@
+{
+  "name": "gro-psicossocial",
+  "version": "1.0.0",
+  "description": "GRO Psicossocial NR-1",
+  "dependencies": {
+    "@netlify/neon": "^0.1.0"
+  }
+}
