@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>GRO Psicossocial — NR-1</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GRO NR-1">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="theme-color" content="#161510">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1D9E75;--gd:#0F6E56;--gl:#E1F5EE;--gm:#9FE1CB;
+  --am:#BA7517;--al:#FAEEDA;
+  --rd:#E24B4A;--rl:#FCEBEB;
+  --bl:#378ADD;--bll:#E6F1FB;
+  --pu:#7C3AED;--pul:#EDE9FE;
+  --tx:#1A1918;--t2:#6B6966;--t3:#9B9895;
+  --bg:#F7F5F0;--sf:#FFF;--br:#E5E2DA;
+  --grl:#F1EFE8;--grm:#D3D1C7;
+  --r:10px;--rl2:16px
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* ══════════════════════════════════════════
+   TELA DO COLABORADOR
+══════════════════════════════════════════ */
+#screen-colab{background:var(--bg)}
+.colab-wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px}
+.colab-header{text-align:center;padding:32px 0 24px}
+.colab-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--gd);margin-bottom:4px}
+.colab-sub{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px}
+/* Form estados */
+#colab-intro,#colab-form,#colab-done{display:none}
+#colab-intro.show,#colab-form.show,#colab-done.show{display:block}
+.intro-card{background:var(--sf);border:1px solid var(--br);border-radius:var(--rl2);padding:28px 24px}
+.intro-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px}
+.intro-desc{font-size:13.5px;color:var(--t2);line-height:1.7;margin-bottom:16px}
+.info-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.pill{background:var(--gl);color:var(--gd);font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500}
+/* Progress */
+.prog-wrap{margin-bottom:20px}
+.prog-info{display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-bottom:6px}
+.prog-track{background:var(--grl);border-radius:99px;height:5px;overflow:hidden}
+.prog-fill{background:var(--g);height:100%;border-radius:99px;transition:width .4s}
+/* Questions */
+.qcard{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:18px 20px;margin-bottom:10px;transition:border-color .2s}
+.qcard:focus-within{border-color:var(--g)}
+.qdim{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gd);margin-bottom:5px}
+.qlabel{font-size:14px;font-weight:500;line-height:1.5;margin-bottom:14px}
+.likert{display:flex;gap:6px;flex-wrap:wrap}
+.lopt{flex:1;min-width:80px}.lopt input{display:none}
+.lopt label{display:block;text-align:center;padding:8px 4px;border:1px solid var(--br);border-radius:8px;cursor:pointer;font-size:11.5px;color:var(--t2);transition:all .15s;line-height:1.3;-webkit-tap-highlight-color:transparent}
+.lopt input:checked+label{background:var(--g);color:#fff;border-color:var(--g);font-weight:500}
+.lopt label:hover{border-color:var(--gm);color:var(--gd)}
+/* Assédio sexual */
+.assedio-block{background:linear-gradient(135deg,#FDF4FF,#F5F0FF);border:2px solid #C4B5FD;border-radius:var(--rl2);padding:22px;margin-bottom:10px}
+.assedio-hdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.assedio-icon{font-size:26px;flex-shrink:0}
+.assedio-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#5B21B6;margin-bottom:3px}
+.assedio-desc{font-size:13px;color:#6D28D9;line-height:1.6}
+.conf-box{background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:12px 14px;font-size:12px;color:#5B21B6;margin-bottom:14px;line-height:1.5}
+.lopt-pu input:checked+label{background:var(--pu);border-color:var(--pu);color:#fff}
+.lopt-pu label:hover{border-color:#C4B5FD;color:var(--pu)}
+.qcard.pu:focus-within{border-color:var(--pu)}
+.toggle-row{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;-webkit-user-select:none;margin-bottom:14px}
+.tog-track{width:42px;height:24px;background:var(--grm);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0}
+.tog-thumb{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog-track.on{background:var(--pu)}.tog-track.on .tog-thumb{left:20px}
+.id-fields{display:none}.id-fields.show{display:block}
+.id-fields .fld{margin-bottom:10px}
+.id-fields .fld label{font-size:12px;font-weight:500;display:block;margin-bottom:4px;color:var(--t2)}
+.id-fields .fld input,.id-fields .fld textarea{width:100%;padding:8px 12px;border:1px solid #C4B5FD;border-radius:8px;font-family:'Inter',sans-serif;font-size:13.5px;outline:none}
+.id-fields .fld input:focus,.id-fields .fld textarea:focus{border-color:var(--pu)}
+/* Resultado colaborador */
+.done-hero{text-align:center;padding:28px 20px;background:linear-gradient(135deg,var(--gl),#fff);border-radius:var(--rl2);border:1px solid var(--gm);margin-bottom:16px}
+.done-score{font-family:'Syne',sans-serif;font-size:52px;font-weight:700;color:var(--gd);line-height:1}
+.gauge-wrap{height:8px;background:var(--grl);border-radius:99px;overflow:hidden;margin-bottom:5px}
+.gauge-fill{height:100%;border-radius:99px;transition:width .8s}
+.gauge-lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--t3)}
+/* Botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none;-webkit-tap-highlight-color:transparent}
+.btn-g{background:var(--g);color:#fff}.btn-g:hover{background:var(--gd)}
+.btn-out{background:transparent;color:var(--tx);border:1px solid var(--br)}.btn-out:hover{background:var(--grl)}
+.btn-pu{background:var(--pu);color:#fff}.btn-pu:hover{background:#5B21B6}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn-row.end{justify-content:flex-end}
+/* Tags */
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.tag.g{background:var(--gl);color:var(--gd)}.tag.a{background:var(--al);color:var(--am)}
+.tag.r{background:var(--rl);color:var(--rd)}.tag.gy{background:var(--grl);color:#5F5E5A}
+.tag.pu{background:var(--pul);color:var(--pu)}.tag.bl{background:var(--bll);color:var(--bl)}
+/* Campo padrão */
+.fld{margin-bottom:12px}
+.fld label{font-size:12px;font-weight:500;display:block;margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:9px 12px;border:1px solid var(--br);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13.5px;outline:none;background:#fff}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--g)}
+
+/* ══════════════════════════════════════════
+   TELA DE LOGIN RH
+══════════════════════════════════════════ */
+#screen-login{background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--sf);border:1px solid var(--br);border-radius:var(--rl2);padding:36px 32px;width:100%;max-width:380px;margin:20px}
+.login-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--gd);margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:28px}
+.login-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px}
+.login-desc{font-size:13px;color:var(--t2);margin-bottom:24px}
+.login-error{background:var(--rl);color:var(--rd);font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:none}
+.login-error.show{display:block}
+.login-hint{font-size:11.5px;color:var(--t3);margin-top:14px;text-align:center}
+.login-link{color:var(--g);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'Inter',sans-serif;font-size:11.5px}
+
+/* ══════════════════════════════════════════
+   TELA RH (DASHBOARD COMPLETO)
+══════════════════════════════════════════ */
+#screen-rh{background:var(--bg)}
+.app-layout{display:flex;min-height:100vh}
+/* Sidebar */
+.sidebar{width:252px;background:#161510;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;overflow-y:auto;z-index:100;-webkit-overflow-scrolling:touch}
+.logo-wrap{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo-title{font-family:'Syne',sans-serif;font-size:18px;color:var(--gm);font-weight:700}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
+.nav{flex:1;padding:10px 0}
+.nav-lbl{padding:12px 20px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.25)}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;font-size:13.5px;color:rgba(255,255,255,.55);transition:all .15s;border-left:3px solid transparent;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;font-family:'Inter',sans-serif;text-align:left;-webkit-tap-highlight-color:rgba(255,255,255,.08)}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.nav-btn.active{background:rgba(29,158,117,.12);color:var(--gm);border-left-color:var(--g)}
+.nav-btn .ico{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.nav-footer p{font-size:10.5px;color:rgba(255,255,255,.22);line-height:1.5}
+/* Main */
+.rh-main{margin-left:252px;flex:1}
+.topbar{background:var(--sf);border-bottom:1px solid var(--br);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-l{display:flex;align-items:center;gap:10px}
+.topbar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.tb-right{display:flex;align-items:center;gap:10px}
+.rh-content{padding:28px;max-width:980px}
+/* Pages */
+.rh-page{display:none}.rh-page.active{display:block}
+/* Cards */
+.card{background:var(--sf);border:1px solid var(--br);border-radius:var(--rl2);padding:22px;margin-bottom:16px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600}
+.card-sub{font-size:11.5px;color:var(--t3);margin-top:2px}
+/* Stats */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:14px 16px}
+.stat-lbl{font-size:11.5px;color:var(--t3);margin-bottom:3px}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.stat-desc{font-size:11.5px;color:var(--t2);margin-top:2px}
+.stat.g .stat-val{color:var(--gd)}.stat.a .stat-val{color:var(--am)}.stat.r .stat-val{color:var(--rd)}.stat.b .stat-val{color:var(--bl)}
+/* Risk bars */
+.risk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--br)}
+.risk-row:last-child{border-bottom:none}
+.risk-name{flex:1;font-size:13px}
+.risk-bar-wrap{width:150px;height:6px;background:var(--grl);border-radius:99px;overflow:hidden;flex-shrink:0}
+.risk-bar{height:100%;border-radius:99px;transition:width .6s}
+.risk-pct{font-size:12px;font-weight:500;width:34px;text-align:right;flex-shrink:0}
+/* Checklist */
+.cl-sec{margin-bottom:18px}
+.cl-sec-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:9px 14px;background:var(--grl);border-radius:var(--r);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--sf);border:1px solid var(--br);border-radius:8px;margin-bottom:5px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.cl-item.done{background:var(--gl);border-color:var(--gm)}
+.cl-check{width:20px;height:20px;border:2px solid var(--br);border-radius:5px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.cl-item.done .cl-check{background:var(--g);border-color:var(--g);color:#fff}
+.cl-text{font-size:13px;line-height:1.5;flex:1}
+.cl-ref{font-size:11px;color:var(--t3);margin-top:2px}
+/* Inventory */
+.inv-item{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:14px 18px;margin-bottom:9px}
+.inv-hdr{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.inv-title{font-weight:500;font-size:13.5px;flex:1}
+.inv-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.inv-meta span{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--grl);color:#5F5E5A}
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);border-bottom:1px solid var(--br);font-weight:500}
+td{padding:10px 12px;border-bottom:1px solid var(--br);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--grl)}
+/* Alert */
+.alert{border-radius:var(--r);padding:12px 16px;font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.alert.amber{background:var(--al);border:1px solid #FAC775;color:var(--am)}
+.alert.purple{background:var(--pul);border:1px solid #C4B5FD;color:var(--pu)}
+.alert.red{background:var(--rl);border:1px solid #F7C1C1;color:var(--rd)}
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+/* Progress */
+.prog-track{background:var(--grl);border-radius:99px;height:5px;overflow:hidden}
+.prog-fill{background:var(--g);height:100%;border-radius:99px;transition:width .4s}
+
+/* ── RELATÓRIOS CONFIDENCIAIS ── */
+.relato-card{background:var(--sf);border:1px solid var(--br);border-radius:var(--r);padding:14px 18px;margin-bottom:9px;border-left:3px solid var(--pu)}
+
+/* ── PDF PREVIEW ── */
+#pdf-preview{background:#fff;padding:32px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;display:none}
+#pdf-preview.show{display:block}
+.pdf-capa{text-align:center;padding:40px 0 32px;border-bottom:2px solid var(--g);margin-bottom:28px}
+.pdf-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--gd)}
+.pdf-empresa{font-size:18px;font-weight:600;margin:12px 0 4px}
+.pdf-data{font-size:13px;color:var(--t3)}
+.pdf-section{margin-bottom:24px}
+.pdf-section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px}
+.pdf-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pdf-bar-label{width:220px;font-size:12px;flex-shrink:0}
+.pdf-bar-track{flex:1;height:12px;background:var(--grl);border-radius:99px;overflow:hidden}
+.pdf-bar-fill{height:100%;border-radius:99px}
+.pdf-bar-pct{width:36px;text-align:right;font-size:12px;font-weight:600;flex-shrink:0}
+.pdf-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.pdf-table th{background:var(--gd);color:#fff;padding:8px 10px;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.pdf-table td{padding:8px 10px;border-bottom:1px solid var(--br)}
+.pdf-table tr:nth-child(even) td{background:var(--grl)}
+.pdf-exec-item{padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:13px}
+.pdf-exec-item.r{background:var(--rl);border-left:3px solid var(--rd)}
+.pdf-exec-item.a{background:var(--al);border-left:3px solid var(--am)}
+.pdf-exec-item.g{background:var(--gl);border-left:3px solid var(--g)}
+
+/* ── COMPARTILHAR ── */
+.share-url-row{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.share-url-inp{flex:1;padding:9px 12px;border:1px solid var(--br);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13px}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px;background:#fff;border:1px solid var(--br);border-radius:var(--rl2)}
+
+/* ══ MOBILE ══ */
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;flex-direction:column;gap:5px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--tx);border-radius:2px;transition:all .2s}
+.hamburger.open span:nth-child(1){-webkit-transform:translateY(7px) rotate(45deg);transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){-webkit-transform:translateY(-7px) rotate(-45deg);transform:translateY(-7px) rotate(-45deg)}
+.sb-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99}
+.sb-overlay.open{display:block}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#161510;border-top:1px solid rgba(255,255,255,.1);z-index:90;padding:0 4px env(safe-area-inset-bottom,4px)}
+.bnav-inner{display:flex;justify-content:space-around}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;cursor:pointer;color:rgba(255,255,255,.4);font-size:9.5px;min-width:50px;border:none;background:none;font-family:'Inter',sans-serif;-webkit-tap-highlight-color:rgba(255,255,255,.1)}
+.bnav-btn.active{color:var(--gm)}
+.bnav-btn .bi{font-size:19px;line-height:1}
+.more-sheet{position:fixed;bottom:0;left:0;right:0;background:#1e1c17;border-radius:16px 16px 0 0;z-index:9999;padding:14px 0 44px;visibility:hidden;opacity:0;-webkit-transition:opacity .2s,visibility .2s;transition:opacity .2s,visibility .2s}
+.more-sheet.open{visibility:visible;opacity:1}
+.more-handle{width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 14px}
+.more-btn{display:flex;align-items:center;gap:12px;padding:13px 24px;color:rgba(255,255,255,.8);font-size:14px;background:none;border:none;width:100%;font-family:'Inter',sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.1)}
+.more-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998}
+.more-overlay.open{display:block}
+@media(max-width:820px){
+  .sidebar{-webkit-transform:translateX(-252px);transform:translateX(-252px);-webkit-transition:-webkit-transform .25s;transition:transform .25s;z-index:200;display:flex}
+  .sidebar.open{-webkit-transform:translateX(0);transform:translateX(0)}
+  .rh-main{margin-left:0}
+  .hamburger{display:flex}
+  .topbar{padding:0 14px}
+  .rh-content{padding:16px 14px 88px}
+  .bottom-nav{display:block}
+  .g2,.g3{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .likert{display:grid;grid-template-columns:1fr 1fr}
+  .lopt{min-width:unset}
+  .risk-bar-wrap{width:90px}
+  .topbar-title{font-size:13px}
+  .hide-m{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     TELA COLABORADOR
+══════════════════════════════════ -->
+<div class="screen active" id="screen-colab">
+  <div class="colab-wrap">
+    <div class="colab-header">
+      <div class="colab-logo">GRO Psicossocial</div>
+      <div class="colab-sub">NR-1 · Portaria MTE 1.419/2024</div>
+    </div>
+
+    <!-- INTRO -->
+    <div id="colab-intro" class="show">
+      <div class="intro-card">
+        <div class="intro-title">Avaliação de Riscos Psicossociais</div>
+        <div class="intro-desc">Este questionário avalia as <strong>condições de trabalho</strong> a que você está exposto — não sua saúde mental. Suas respostas são anônimas e contribuem para melhorar o ambiente de trabalho.</div>
+        <div class="info-pills">
+          <span class="pill">✓ Anônimo</span>
+          <span class="pill">✓ ~12 minutos</span>
+          <span class="pill">✓ 28 perguntas</span>
+        </div>
+        <div class="fld"><label>Setor / Área de trabalho</label><input id="c-setor" type="text" placeholder="Ex: Administrativo, Produção, RH..."></div>
+        <button class="btn btn-g" onclick="colabStart()" style="width:100%">Iniciar avaliação →</button>
+        <div style="text-align:center;margin-top:16px">
+          <button class="login-link" onclick="showLogin()">Acesso RH / SST</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div id="colab-form">
+      <div class="prog-wrap">
+        <div class="prog-info"><span id="cp-label">Dimensão 1 de 7</span><span id="cp-pct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="cp-bar" style="width:0%"></div></div>
+      </div>
+      <div id="colab-steps"></div>
+      <div id="colab-assedio" style="display:none">
+        <div class="assedio-block">
+          <div class="assedio-hdr">
+            <div class="assedio-icon">🔒</div>
+            <div>
+              <div class="assedio-title">Seção Confidencial — Assédio Sexual</div>
+              <div class="assedio-desc">Tratada com sigilo absoluto. Registrada separadamente. Acessada somente pelo responsável de SST.</div>
+            </div>
+          </div>
+          <div class="conf-box">🛡️ Identificação completamente opcional. Sem identificação = resposta totalmente anônima.</div>
+          <div id="assedio-qs"></div>
+          <div style="background:#fff;border:1px solid #C4B5FD;border-radius:var(--r);padding:14px 16px;margin-top:14px">
+            <div style="font-size:13px;font-weight:600;color:#5B21B6;margin-bottom:3px">Identificação (opcional)</div>
+            <div style="font-size:12px;color:var(--pu);margin-bottom:12px">Permite que a organização entre em contato para oferecer suporte ou tomar ação corretiva.</div>
+            <div class="toggle-row" onclick="toggleId()">
+              <div class="tog-track" id="tog-track"><div class="tog-thumb"></div></div>
+              <span style="font-size:13px;color:var(--t2)" id="tog-lbl">Prefiro permanecer anônimo(a)</span>
+            </div>
+            <div class="id-fields" id="id-fields">
+              <div class="fld"><label>Nome completo</label><input id="id-nome" type="text" placeholder="Seu nome..."></div>
+              <div class="fld"><label>Contato (e-mail ou ramal)</label><input id="id-contato" type="text" placeholder="email@empresa.com"></div>
+              <div class="fld"><label>Descreva o ocorrido (opcional)</label><textarea id="id-desc" rows="3" style="resize:vertical" placeholder="O que aconteceu, quando, envolvidos..."></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row end" style="margin-top:16px">
+        <button class="btn btn-out" id="cb-prev" onclick="colabPrev()" style="display:none">← Anterior</button>
+        <button class="btn btn-g" id="cb-next" onclick="colabNext()">Próxima →</button>
+      </div>
+    </div>
+
+    <!-- DONE -->
+    <div id="colab-done">
+      <div class="done-hero">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:8px">Seu índice de risco percebido</div>
+        <div class="done-score" id="done-score">—</div>
+        <div style="margin-top:12px" id="done-badge"></div>
+      </div>
+      <div id="done-dims"></div>
+      <div style="background:var(--gl);border:1px solid var(--gm);border-radius:var(--r);padding:14px 16px;font-size:13px;color:var(--gd);margin-top:8px">
+        ✓ Obrigado pela participação! Suas respostas foram registradas e contribuirão para melhorar o ambiente de trabalho.
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-out" onclick="colabReset()" style="flex:1">Nova avaliação</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     TELA LOGIN RH
+══════════════════════════════════ -->
+<div class="screen" id="screen-login">
+  <div class="login-box">
+    <div class="login-logo">GRO Psicossocial</div>
+    <div class="login-sub">Área restrita — RH / SST</div>
+    <div class="login-title">Acesso Gerencial</div>
+    <div class="login-desc">Digite a senha para acessar o painel de gestão.</div>
+    <div class="login-error" id="login-err">Senha incorreta. Tente novamente.</div>
+    <div class="fld"><label>Senha</label><input id="login-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-g" onclick="doLogin()" style="width:100%">Entrar</button>
+    <div class="login-hint"><button class="login-link" onclick="showColab()">← Voltar ao questionário</button></div>
+    <div style="margin-top:12px;background:var(--al);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--am)">
+      💡 Senha padrão: <strong>rh1234</strong> — altere em Configurações após o primeiro acesso.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     TELA RH
+══════════════════════════════════ -->
+<div class="screen" id="screen-rh">
+  <!-- Mobile overlay -->
+  <button id="sb-overlay" class="sb-overlay" onclick="closeSb()" style="border:none;cursor:default" aria-label="Fechar menu"></button>
+  <button id="more-overlay" class="more-overlay" onclick="closeMore()" style="border:none;cursor:default" aria-label="Fechar"></button>
+  <!-- More sheet -->
+  <div class="more-sheet" id="more-sheet">
+    <div class="more-handle"></div>
+    <button class="more-btn" onclick="rhGoto('checklist')"><span>✓</span> Checklist NR-1</button>
+    <button class="more-btn" onclick="rhGoto('inventario')"><span>⊞</span> Inventário de Riscos</button>
+    <button class="more-btn" onclick="rhGoto('plano')"><span>→</span> Plano de Ação</button>
+    <button class="more-btn" onclick="rhGoto('compartilhar')"><span>⇗</span> Compartilhar</button>
+    <button class="more-btn" onclick="rhGoto('relatos')"><span>🔒</span> Relatos Confidenciais</button>
+    <button class="more-btn" onclick="rhGoto('config')"><span>⚙</span> Configurações</button>
+    <button class="more-btn" onclick="rhGoto('pdf')" style="color:var(--gm)"><span>📄</span> Exportar PDF</button>
+  </div>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="rh-sidebar">
+      <div class="logo-wrap">
+        <div class="logo-title">GRO Psicossocial</div>
+        <div class="logo-sub">Painel RH / SST</div>
+      </div>
+      <div class="nav">
+        <div class="nav-lbl">Principal</div>
+        <button class="nav-btn active" id="snav-dashboard" onclick="rhGoto('dashboard')"><span class="ico">◉</span> Dashboard</button>
+        <button class="nav-btn" id="snav-resultados" onclick="rhGoto('resultados')"><span class="ico">◈</span> Resultados</button>
+        <button class="nav-btn" id="snav-checklist" onclick="rhGoto('checklist')"><span class="ico">✓</span> Checklist NR-1</button>
+        <div class="nav-lbl">Gestão</div>
+        <button class="nav-btn" id="snav-inventario" onclick="rhGoto('inventario')"><span class="ico">⊞</span> Inventário de Riscos</button>
+        <button class="nav-btn" id="snav-plano" onclick="rhGoto('plano')"><span class="ico">→</span> Plano de Ação</button>
+        <button class="nav-btn" id="snav-relatos" onclick="rhGoto('relatos')"><span class="ico">🔒</span> Relatos Conf.</button>
+        <div class="nav-lbl">Ferramentas</div>
+        <button class="nav-btn" id="snav-compartilhar" onclick="rhGoto('compartilhar')"><span class="ico">⇗</span> Compartilhar</button>
+        <button class="nav-btn" id="snav-pdf" onclick="rhGoto('pdf')"><span class="ico">📄</span> Exportar PDF</button>
+        <button class="nav-btn" id="snav-config" onclick="rhGoto('config')"><span class="ico">⚙</span> Configurações</button>
+      </div>
+      <div class="nav-footer">
+        <p>NR-1 · Portaria MTE 1.416/2024<br>Vigência: 26/05/2026</p>
+        <button onclick="doLogout()" style="margin-top:10px;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;width:100%">Sair →</button>
+      </div>
+    </nav>
+    <!-- Main -->
+    <div class="rh-main">
+      <div class="topbar">
+        <div class="topbar-l">
+          <button class="hamburger" id="hb-btn" onclick="toggleSb()"><span></span><span></span><span></span></button>
+          <span class="topbar-title" id="rh-page-title">Dashboard</span>
+          <span class="tag g">NR-1 + NR-17</span>
+        </div>
+        <div class="tb-right">
+          <span class="tag gy" id="tb-date"></span>
+        </div>
+      </div>
+      <div class="rh-content">
+
+        <!-- DASHBOARD -->
+        <div class="rh-page active" id="rh-page-dashboard">
+          <div id="dash-assedio-alert"></div>
+          <div class="stat-row">
+            <div class="stat g"><div class="stat-lbl">Avaliações</div><div class="stat-val" id="st-aval">0</div><div class="stat-desc">respondidas</div></div>
+            <div class="stat a"><div class="stat-lbl">Riscos</div><div class="stat-val" id="st-risco">0</div><div class="stat-desc">no inventário</div></div>
+            <div class="stat r"><div class="stat-lbl">Pendentes</div><div class="stat-val" id="st-pend">0</div><div class="stat-desc">checklist NR-1</div></div>
+            <div class="stat b"><div class="stat-lbl">Conformidade</div><div class="stat-val" id="st-conf">0%</div><div class="stat-desc">checklist</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div><div class="card-title">Perfil de risco — COPSOQ II</div><div class="card-sub">Média das avaliações · 0–100 (maior = mais risco)</div></div></div>
+            <div id="dash-bars"><div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhuma avaliação respondida ainda.</div></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-hd"><div class="card-title">Perigos psicossociais (Guia MTE 2025)</div></div>
+              <table><thead><tr><th>Fator de risco</th><th>Consequência</th></tr></thead><tbody>
+                <tr><td>Excesso de demandas</td><td><span class="tag a">Transtorno; DORT</span></td></tr>
+                <tr><td>Assédio de qualquer natureza</td><td><span class="tag r">Transtorno mental</span></td></tr>
+                <tr><td>Baixa autonomia/controle</td><td><span class="tag a">Transtorno; DORT</span></td></tr>
+                <tr><td>Falta de suporte/apoio</td><td><span class="tag a">Transtorno mental</span></td></tr>
+                <tr><td>Baixa justiça organizacional</td><td><span class="tag a">Transtorno mental</span></td></tr>
+                <tr><td>Trabalho remoto/isolado</td><td><span class="tag gy">Fadiga; Transtorno</span></td></tr>
+                <tr><td>Eventos violentos/traumáticos</td><td><span class="tag r">Transtorno mental</span></td></tr>
+              </tbody></table>
+            </div>
+            <div class="card">
+              <div class="card-hd"><div class="card-title">Ciclo GRO — PDCA (NR-1)</div></div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;gap:10px;padding:9px;background:var(--bll);border-radius:8px"><span style="font-size:17px;width:22px">P</span><div><div style="font-size:13px;font-weight:600;color:var(--bl)">Planejar</div><div style="font-size:12px;color:var(--t2)">Preparação, estratégia, responsabilidades</div></div></div>
+                <div style="display:flex;gap:10px;padding:9px;background:var(--gl);border-radius:8px"><span style="font-size:17px;width:22px">D</span><div><div style="font-size:13px;font-weight:600;color:var(--gd)">Fazer</div><div style="font-size:12px;color:var(--t2)">AEP — Identificação de perigos (COPSOQ II)</div></div></div>
+                <div style="display:flex;gap:10px;padding:9px;background:var(--al);border-radius:8px"><span style="font-size:17px;width:22px">C</span><div><div style="font-size:13px;font-weight:600;color:var(--am)">Checar</div><div style="font-size:12px;color:var(--t2)">Monitoramento, indicadores, revisão</div></div></div>
+                <div style="display:flex;gap:10px;padding:9px;background:#FAECE7;border-radius:8px"><span style="font-size:17px;width:22px">A</span><div><div style="font-size:13px;font-weight:600;color:#D85A30">Agir</div><div style="font-size:12px;color:var(--t2)">Plano de ação, medidas de prevenção</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="rh-page" id="rh-page-resultados">
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Histórico de avaliações</div></div>
+            <div id="res-body"><div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhuma avaliação respondida ainda.</div></div>
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <div class="rh-page" id="rh-page-checklist">
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div class="card-title">Checklist de conformidade NR-1</div><div class="card-sub">Guia MTE 2025 + Manual GRO/PGR</div></div>
+              <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--gd)" id="cl-pct">0%</div><div style="font-size:11px;color:var(--t3)">concluído</div></div>
+            </div>
+            <div class="prog-track" style="margin-top:12px"><div class="prog-fill" id="cl-bar" style="width:0%"></div></div>
+          </div>
+          <div id="cl-body"></div>
+        </div>
+
+        <!-- INVENTÁRIO -->
+        <div class="rh-page" id="rh-page-inventario">
+          <div class="card">
+            <div class="card-hd">
+              <div><div class="card-title">Inventário de Riscos Psicossociais</div><div class="card-sub">Subitem 1.5.7.3.2 da NR-1</div></div>
+              <button class="btn btn-g" onclick="showAddRisk()" style="font-size:13px;padding:8px 16px">+ Adicionar</button>
+            </div>
+            <div id="inv-body"></div>
+          </div>
+          <div id="add-risk-form" style="display:none">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:14px">Novo risco</div>
+              <div class="g2">
+                <div class="fld"><label>Perigo</label><select id="r-perigo"><option value="">Selecione...</option><option>Excesso de demandas (sobrecarga)</option><option>Assédio de qualquer natureza</option><option>Assédio sexual</option><option>Baixa autonomia / controle</option><option>Falta de suporte / apoio</option><option>Baixa clareza de papel</option><option>Baixas recompensas e reconhecimento</option><option>Má gestão de mudanças</option><option>Baixa justiça organizacional</option><option>Eventos violentos ou traumáticos</option><option>Trabalho remoto e isolado</option><option>Outro</option></select></div>
+                <div class="fld"><label>Setor / Grupo exposto</label><input id="r-setor" type="text" placeholder="Ex: Produção..."></div>
+              </div>
+              <div class="g3">
+                <div class="fld"><label>Severidade</label><select id="r-sev"><option value="1">Leve</option><option value="2">Moderada</option><option value="3" selected>Alta</option><option value="4">Crítica</option></select></div>
+                <div class="fld"><label>Probabilidade</label><select id="r-prob"><option value="1">Baixa</option><option value="2" selected>Média</option><option value="3">Alta</option></select></div>
+                <div class="fld"><label>Medidas sugeridas</label><input id="r-med" type="text" placeholder="Intervenção prevista..."></div>
+              </div>
+              <div class="btn-row"><button class="btn btn-g" onclick="saveRisk()">Salvar</button><button class="btn btn-out" onclick="cancelRisk()">Cancelar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLANO -->
+        <div class="rh-page" id="rh-page-plano">
+          <div class="card">
+            <div class="card-hd">
+              <div><div class="card-title">Plano de Ação PGR</div><div class="card-sub">Subitem 1.5.5.2 da NR-1</div></div>
+              <button class="btn btn-g" onclick="showAddAction()" style="font-size:13px;padding:8px 16px">+ Nova ação</button>
+            </div>
+            <div id="plano-body"></div>
+          </div>
+          <div id="add-action-form" style="display:none">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:14px">Nova medida de prevenção</div>
+              <div class="g2">
+                <div class="fld"><label>Ação / Medida</label><input id="a-acao" type="text" placeholder="Descreva a intervenção..."></div>
+                <div class="fld"><label>Responsável</label><input id="a-resp" type="text" placeholder="Nome ou cargo..."></div>
+                <div class="fld"><label>Prazo</label><input id="a-prazo" type="date"></div>
+                <div class="fld"><label>Prioridade</label><select id="a-prio"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>
+              </div>
+              <div class="btn-row"><button class="btn btn-g" onclick="saveAction()">Salvar</button><button class="btn btn-out" onclick="cancelAction()">Cancelar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RELATOS CONFIDENCIAIS -->
+        <div class="rh-page" id="rh-page-relatos">
+          <div class="alert purple" style="margin-bottom:16px"><span style="font-size:20px">🔒</span><div><strong>Acesso restrito.</strong> Os relatos desta seção são confidenciais e devem ser tratados conforme política interna e legislação trabalhista.</div></div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Relatos de Assédio Sexual</div><span class="tag pu" id="relatos-cnt">0 relatos</span></div>
+            <div id="relatos-body"><div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhum relato registrado.</div></div>
+          </div>
+        </div>
+
+        <!-- COMPARTILHAR -->
+        <div class="rh-page" id="rh-page-compartilhar">
+          <div class="card" style="background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border-color:#86EFAC">
+            <div class="card-title" style="color:var(--gd);margin-bottom:6px">📤 Compartilhar questionário</div>
+            <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Cole a URL após publicar no Netlify para gerar o QR Code e o link de WhatsApp.</div>
+            <div class="share-url-row">
+              <input class="share-url-inp" id="share-url" type="text" placeholder="https://seu-app.netlify.app">
+              <button class="btn btn-g" onclick="updateQR()" style="white-space:nowrap">Gerar QR</button>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" style="background:#25D366;color:#fff" onclick="shareWpp()">📱 WhatsApp</button>
+              <button class="btn btn-out" onclick="printQR()">🖨️ Imprimir QR</button>
+              <button class="btn btn-out" onclick="dlQR()" id="btn-dl-qr" style="display:none">⬇ Baixar QR</button>
+            </div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div class="qr-wrap" id="qr-wrap">
+              <div id="qr-container"></div>
+              <div style="font-size:12px;color:var(--t3);text-align:center;max-width:220px" id="qr-lbl">Informe a URL acima e clique em "Gerar QR"</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Como publicar no Netlify (gratuito)</div>
+            <div class="g3">
+              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">1️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Acesse app.netlify.com/drop</div><div style="font-size:12px;color:var(--t2)">No computador</div></div>
+              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">2️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Arraste a pasta do app</div><div style="font-size:12px;color:var(--t2)">A pasta com index.html</div></div>
+              <div style="padding:14px;background:var(--grl);border-radius:var(--r);text-align:center"><div style="font-size:24px;margin-bottom:6px">3️⃣</div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Cole o link gerado</div><div style="font-size:12px;color:var(--t2)">No campo acima</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PDF -->
+        <div class="rh-page" id="rh-page-pdf">
+          <div class="card">
+            <div class="card-hd"><div><div class="card-title">Exportar Relatório PDF</div><div class="card-sub">Documento para anexar ao PGR e apresentar em fiscalizações</div></div></div>
+            <div class="g2" style="margin-bottom:16px">
+              <div class="fld"><label>Nome da empresa</label><input id="pdf-empresa" type="text" placeholder="Razão social da empresa..."></div>
+              <div class="fld"><label>CNPJ</label><input id="pdf-cnpj" type="text" placeholder="00.000.000/0000-00"></div>
+              <div class="fld"><label>Responsável técnico</label><input id="pdf-resp" type="text" placeholder="Nome e CRA/CRQ/CRM..."></div>
+              <div class="fld"><label>Período de avaliação</label><input id="pdf-periodo" type="text" placeholder="Ex: Jan–Mar 2026"></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-g" onclick="generatePDF()">📄 Gerar relatório</button>
+              <button class="btn btn-out" onclick="printPDF()">🖨️ Imprimir</button>
+            </div>
+          </div>
+          <div id="pdf-preview"></div>
+        </div>
+
+        <!-- CONFIG -->
+        <div class="rh-page" id="rh-page-config">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:16px">⚙ Configurações</div>
+            <div class="fld"><label>Senha de acesso RH / SST</label>
+              <div style="display:flex;gap:8px">
+                <input id="cfg-pw1" type="password" placeholder="Nova senha..." style="flex:1;padding:9px 12px;border:1px solid var(--br);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13.5px;outline:none">
+                <input id="cfg-pw2" type="password" placeholder="Confirmar..." style="flex:1;padding:9px 12px;border:1px solid var(--br);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13.5px;outline:none">
+                <button class="btn btn-g" onclick="savePw()" style="white-space:nowrap;font-size:13px;padding:9px 16px">Salvar senha</button>
+              </div>
+              <div id="pw-msg" style="font-size:12px;margin-top:6px"></div>
+            </div>
+          </div>
+          <div class="card" style="border-color:#F7C1C1">
+            <div class="card-title" style="margin-bottom:10px;color:var(--rd)">⚠ Zona de perigo</div>
+            <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Apagar todos os dados permanentemente. Esta ação não pode ser desfeita.</div>
+            <button class="btn" style="background:var(--rd);color:#fff" onclick="clearAll()">Apagar todos os dados</button>
+          </div>
+        </div>
+
+      </div><!-- /rh-content -->
+
+      <!-- BOTTOM NAV mobile -->
+      <nav class="bottom-nav">
+        <div class="bnav-inner">
+          <button class="bnav-btn active" id="bn-dashboard" onclick="rhGoto('dashboard')"><span class="bi">◉</span>Dashboard</button>
+          <button class="bnav-btn" id="bn-resultados" onclick="rhGoto('resultados')"><span class="bi">◈</span>Resultados</button>
+          <button class="bnav-btn" id="bn-pdf" onclick="rhGoto('pdf')"><span class="bi">📄</span>PDF</button>
+          <button class="bnav-btn" id="bn-more" onclick="openMore()"><span class="bi">⋯</span>Mais</button>
+        </div>
+      </nav>
+    </div><!-- /rh-main -->
+  </div><!-- /app-layout -->
+</div><!-- /screen-rh -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ══════════════════════════════════════════════
+// CONFIG & API
+// ══════════════════════════════════════════════
+let TOKEN = localStorage.getItem('gro_token') || '';
+let PERFIL = localStorage.getItem('gro_perfil') || '';
+let EMPRESA_ID = parseInt(localStorage.getItem('gro_empresa_id') || '1');
+let EMPRESA_NOME = localStorage.getItem('gro_empresa_nome') || 'Minha Empresa';
+let EMPRESAS_LISTA = [];
+
+function setToken(token, perfil, empresaId, empresaNome) {
+  TOKEN = token; PERFIL = perfil; EMPRESA_ID = parseInt(empresaId); EMPRESA_NOME = empresaNome || 'Minha Empresa';
+  localStorage.setItem('gro_token', token);
+  localStorage.setItem('gro_perfil', perfil);
+  localStorage.setItem('gro_empresa_id', empresaId);
+  localStorage.setItem('gro_empresa_nome', EMPRESA_NOME);
+}
+function clearToken() {
+  TOKEN=''; PERFIL=''; EMPRESA_ID=1;
+  localStorage.removeItem('gro_token');
+  localStorage.removeItem('gro_perfil');
+  localStorage.removeItem('gro_empresa_id');
+  localStorage.removeItem('gro_empresa_nome');
+}
+
+async function api(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+// Inicializa banco na primeira execução
+async function initDB() {
+  try { await fetch('/api/db-init'); } catch(e) { console.log('DB init:', e); }
+}
+
+// ══════════════════════════════════════════════
+// DADOS LOCAIS (cache)
+// ══════════════════════════════════════════════
+let S={responses:[],inventory:[],actions:[],checklist:{},relatos:[]};
+
+async function loadData() {
+  try {
+    const [aval, inv, plan, chk] = await Promise.all([
+      api(`/api/avaliacoes?empresaId=${EMPRESA_ID}`),
+      ['sst','admin'].includes(PERFIL) ? api(`/api/inventario?empresaId=${EMPRESA_ID}`) : Promise.resolve({inventario:[]}),
+      api(`/api/plano?empresaId=${EMPRESA_ID}`),
+      ['sst','admin'].includes(PERFIL) ? api(`/api/checklist?empresaId=${EMPRESA_ID}`) : Promise.resolve({checklist:{}}),
+    ]);
+    S.responses = (aval.avaliacoes||[]).map(a => ({...a, scores: typeof a.scores==='string'?JSON.parse(a.scores):a.scores, overall: a.score_geral, setor: a.setor, date: a.created_at}));
+    S.inventory = (inv.inventario||[]).map(r => ({...r, sev: r.severidade, prob: r.probabilidade, origemScore: r.origem_score, medidas: r.medidas||''}));
+    S.actions = (plan.acoes||[]).map(a => ({...a, acao: a.acao, responsavel: a.responsavel||'', prazo: a.prazo||'', prioridade: a.prioridade, status: a.status}));
+    S.checklist = chk.checklist || {};
+  } catch(e) { console.error('loadData error:', e); }
+}
+
+// ══════════════════════════════════════════════
+// QUESTIONÁRIO — DADOS
+// ══════════════════════════════════════════════
+const DIMS=[
+  {id:'demandas',name:'Exigências do trabalho',color:'#E24B4A',qs:[
+    {id:'q1',text:'Com que frequência você não tem tempo suficiente para concluir todas as suas tarefas?',inv:false},
+    {id:'q2',text:'Com que frequência você precisa trabalhar muito rapidamente?',inv:false},
+    {id:'q3',text:'Seu trabalho exige que você tome decisões difíceis com frequência?',inv:false},
+    {id:'q4',text:'Seu trabalho exige que você esconda seus sentimentos?',inv:false},
+  ]},
+  {id:'organizacao',name:'Organização e conteúdo',color:'#BA7517',qs:[
+    {id:'q5',text:'Você tem influência sobre a quantidade de trabalho que lhe é atribuída?',inv:true},
+    {id:'q6',text:'Você tem possibilidade de aprender coisas novas por meio do seu trabalho?',inv:true},
+    {id:'q7',text:'O seu trabalho é variado (não repetitivo e monótono)?',inv:true},
+    {id:'q8',text:'O seu trabalho tem significado importante para você?',inv:true},
+  ]},
+  {id:'relacoes',name:'Relações sociais e liderança',color:'#378ADD',qs:[
+    {id:'q9',text:'Você recebe informações com antecedência sobre decisões importantes?',inv:true},
+    {id:'q10',text:'A gestão confia que os funcionários fazem um bom trabalho?',inv:true},
+    {id:'q11',text:'Os conflitos são resolvidos de forma justa no seu local de trabalho?',inv:true},
+    {id:'q12',text:'Você recebe elogios e reconhecimento quando realiza um bom trabalho?',inv:true},
+  ]},
+  {id:'suporte',name:'Apoio e liderança',color:'#1D9E75',qs:[
+    {id:'q13',text:'Com que frequência você recebe ajuda e suporte do seu gestor imediato?',inv:true},
+    {id:'q14',text:'Com que frequência você recebe ajuda e suporte de seus colegas?',inv:true},
+    {id:'q15',text:'Você recebe feedback útil sobre o seu trabalho?',inv:true},
+    {id:'q16',text:'Você é informado sobre os resultados do seu trabalho?',inv:true},
+  ]},
+  {id:'interface',name:'Interface trabalho-indivíduo',color:'#9B59B6',qs:[
+    {id:'q17',text:'Você está preocupado em ser demitido ou transferido contra a sua vontade?',inv:false},
+    {id:'q18',text:'Com que frequência você pensa em mudar de emprego?',inv:false},
+    {id:'q19',text:'É difícil conciliar as exigências do trabalho com sua vida pessoal?',inv:false},
+    {id:'q20',text:'Você sente que o trabalho interfere na sua vida fora do trabalho?',inv:false},
+  ]},
+  {id:'saude',name:'Saúde e bem-estar',color:'#E67E22',qs:[
+    {id:'q21',text:'Com que frequência você se sente esgotado(a) emocionalmente pelo trabalho?',inv:false},
+    {id:'q22',text:'Com que frequência você tem dificuldade para dormir por causa do trabalho?',inv:false},
+    {id:'q23',text:'Com que frequência você se sente estressado(a) no trabalho?',inv:false},
+    {id:'q24',text:'Com que frequência você fica sem energia para atividades pessoais após o trabalho?',inv:false},
+  ]},
+  {id:'assedio',name:'Assédio e violência',color:'#C0392B',qs:[
+    {id:'q25',text:'Você já foi exposto(a) a comportamentos ofensivos no trabalho (bullying, assédio moral)?',inv:false},
+    {id:'q26',text:'Você já foi ameaçado(a) por colega, gestor ou cliente no trabalho?',inv:false},
+    {id:'q27',text:'Você se sente seguro(a) para reportar problemas sem medo de represálias?',inv:true},
+    {id:'q28',text:'A organização toma medidas efetivas quando há denúncias de comportamento inadequado?',inv:true},
+  ]},
+];
+const OPTS=[
+  {label:'Sempre',val:4},{label:'Frequentemente',val:3},
+  {label:'Às vezes',val:2},{label:'Raramente',val:1},{label:'Nunca',val:0},
+];
+const AS_QS=[
+  {id:'as1',text:'Você vivenciou insinuações ou propostas de cunho sexual indesejadas no trabalho?',opts:['Nunca','Uma vez','Algumas vezes','Frequentemente']},
+  {id:'as2',text:'Você foi exposto(a) a gestos, comentários ou materiais sexuais ofensivos no trabalho?',opts:['Nunca','Uma vez','Algumas vezes','Frequentemente']},
+  {id:'as3',text:'Você foi tocado(a) de forma indesejada ou inapropriada por alguém no trabalho?',opts:['Nunca','Uma vez','Algumas vezes','Frequentemente']},
+  {id:'as4',text:'Você foi pressionado(a) a aceitar avanços sexuais sob ameaça de consequências?',opts:['Nunca','Uma vez','Algumas vezes','Frequentemente']},
+  {id:'as5',text:'Você sofreu ou presenciou esta situação com outra pessoa no trabalho?',opts:['Nunca','Presenciei com outro','Ocorreu comigo','Comigo e com outros']},
+];
+const DIM_RISK_MAP={
+  demandas:{perigo:'Excesso de demandas / sobrecarga',agravos:'Transtornos mentais, burnout, DORT, doenças cardiovasculares',medidas:'Redistribuição de tarefas; revisão de metas; pausas obrigatórias; rodízio',sev:3,prob:2},
+  organizacao:{perigo:'Baixa autonomia e falta de controle',agravos:'Transtornos mentais, desmotivação, absenteísmo',medidas:'Participação dos trabalhadores; enriquecimento do trabalho; definição de papéis',sev:2,prob:2},
+  relacoes:{perigo:'Déficit de relações sociais e liderança inadequada',agravos:'Transtornos mentais, conflitos, assédio moral',medidas:'Capacitação de lideranças; gestão de conflitos; canais de comunicação',sev:3,prob:2},
+  suporte:{perigo:'Falta de suporte social e apoio',agravos:'Transtornos mentais, isolamento, burnout',medidas:'Redes de apoio; supervisão de suporte; feedback regular',sev:2,prob:2},
+  interface:{perigo:'Desequilíbrio trabalho-vida e insegurança no emprego',agravos:'Transtornos mentais, conflito família-trabalho, fadiga crônica',medidas:'Flexibilização; respeito a horários; comunicação transparente',sev:2,prob:2},
+  saude:{perigo:'Esgotamento emocional e estresse crônico',agravos:'Burnout, depressão, ansiedade, distúrbios do sono',medidas:'Programa de saúde mental; apoio psicológico; monitoramento PCMSO',sev:3,prob:2},
+  assedio:{perigo:'Assédio moral e violência no trabalho',agravos:'Transtornos mentais graves, PTSD, afastamentos',medidas:'Política tolerância zero; canal de denúncias; Comitê de Ética; treinamentos',sev:4,prob:1},
+};
+const CL_DATA=[
+  {sec:'Preparação (Guia MTE 2025)',items:[
+    {id:'c1',text:'Verificou necessidade de ajuda especializada (SESMT, externos)',ref:'Guia MTE 2025, passo 1'},
+    {id:'c2',text:'Envolveu partes interessadas: SESMT, gestores, alta administração, trabalhadores',ref:'Guia MTE 2025, passo 2'},
+    {id:'c3',text:'Atribuiu responsabilidades claras para cada etapa',ref:'Guia MTE 2025, passo 3'},
+    {id:'c4',text:'Comunicou os trabalhadores sobre o processo e garantia de anonimato',ref:'Guia MTE 2025, passo 4'},
+    {id:'c5',text:'Definiu critérios de severidade, probabilidade e nível de risco',ref:'Subitem 1.5.4.4.2.2 da NR-1'},
+  ]},
+  {sec:'Identificação de perigos — AEP (NR-17 + NR-1)',items:[
+    {id:'c6',text:'Realizou AEP — obrigatória mesmo sem PGR',ref:'Item 17.3.1 da NR-17'},
+    {id:'c7',text:'Considerou o trabalho real, não o trabalho prescrito',ref:'Manual GRO/PGR, cap. 17.2'},
+    {id:'c8',text:'Aplicou ferramenta com validação científica (COPSOQ II)',ref:'Subitem 1.5.4.4.2.1 da NR-1'},
+    {id:'c9',text:'Garantiu anonimato e criou ambiente de confiança',ref:'Guia MTE 2025, cap. 3'},
+    {id:'c10',text:'Viabilizou participação dos trabalhadores em todas as etapas',ref:'Item 17.3.8 da NR-17'},
+  ]},
+  {sec:'Avaliação e classificação de riscos',items:[
+    {id:'c11',text:'Avaliou cada risco psicossocial (severidade × probabilidade)',ref:'Subitem 1.5.4.4.2 da NR-1'},
+    {id:'c12',text:'Considerou exigências da atividade e eficácia das medidas',ref:'Subitem 1.5.4.4.5.3 da NR-1'},
+    {id:'c13',text:'Classificou os riscos para o plano de ação',ref:'Subitem 1.5.7.3.2 i) da NR-1'},
+    {id:'c14',text:'Registrou no inventário todos os itens do subitem 1.5.7.3.2',ref:'NR-1, subitem 1.5.7.3.2'},
+  ]},
+  {sec:'Medidas de prevenção — Plano de ação PGR',items:[
+    {id:'c15',text:'Elaborou plano com responsáveis, cronograma e acompanhamento',ref:'Subitem 1.5.5.2.2 da NR-1'},
+    {id:'c16',text:'Priorizou intervenções que modifiquem organização do trabalho',ref:'NR-1, subitem 1.4.1 "g"'},
+    {id:'c17',text:'Preferiu medidas coletivas sobre medidas individuais',ref:'Subitem 1.5.5.1.2 da NR-1'},
+    {id:'c18',text:'Envolveu trabalhadores e CIPA no acompanhamento',ref:'Guia MTE 2025, cap. 5'},
+  ]},
+  {sec:'Documentação PGR — subitem 1.5.7.3.2',items:[
+    {id:'c19',text:'Caracterização dos processos e ambientes de trabalho',ref:'1.5.7.3.2 a)'},
+    {id:'c20',text:'Caracterização das atividades',ref:'1.5.7.3.2 b)'},
+    {id:'c21',text:'Descrição dos perigos e fontes/circunstâncias',ref:'1.5.7.3.2 c)'},
+    {id:'c22',text:'Indicação das possíveis lesões ou agravos à saúde',ref:'1.5.7.3.2 d)'},
+    {id:'c23',text:'Indicação dos grupos de trabalhadores expostos',ref:'1.5.7.3.2 e)'},
+    {id:'c24',text:'Descrição das medidas de prevenção implementadas',ref:'1.5.7.3.2 f)'},
+    {id:'c25',text:'Caracterização da exposição dos trabalhadores',ref:'1.5.7.3.2 g)'},
+    {id:'c26',text:'Dados da avaliação de ergonomia (NR-17)',ref:'1.5.7.3.2 h)'},
+    {id:'c27',text:'Avaliação e classificação dos riscos para o plano',ref:'1.5.7.3.2 i)'},
+  ]},
+];
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function showColab(){showScreen('colab');}
+function showLogin(){showScreen('login');setTimeout(()=>document.getElementById('login-pw').focus(),100);}
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+async function doLogin(){
+  const pw = document.getElementById('login-pw').value;
+  const perfil = document.getElementById('login-perfil')?.value || 'rh';
+  const empresaId = document.getElementById('login-empresa')?.value || 1;
+  const err = document.getElementById('login-err');
+
+  try {
+    const result = await api('/api/auth?action=login', 'POST', { senha: pw, perfil, empresaId: parseInt(empresaId) });
+    if (result.ok) {
+      err.classList.remove('show');
+      document.getElementById('login-pw').value = '';
+      const empNome = EMPRESAS_LISTA.find(e=>e.id==empresaId)?.nome || 'Minha Empresa';
+      setToken(result.token, result.perfil, empresaId, empNome);
+      PERFIL = result.perfil;
+      await loadData();
+      showScreen('rh');
+      renderDashboard();
+      document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+      document.getElementById('rh-page-title').textContent='Dashboard';
+      // Atualiza visibilidade dos menus por perfil
+      atualizaMenuPerfil();
+    } else {
+      err.classList.add('show');
+      document.getElementById('login-pw').value='';
+    }
+  } catch(e) {
+    err.classList.add('show');
+    document.getElementById('login-pw').value='';
+  }
+}
+function atualizaMenuPerfil() {
+  const snavChecklist = document.getElementById('snav-checklist');
+  const snavInventario = document.getElementById('snav-inventario');
+  const snavAdmin = document.getElementById('snav-admin');
+  // RH não vê checklist nem inventário
+  if (PERFIL === 'rh') {
+    if (snavChecklist) snavChecklist.style.display = 'none';
+    if (snavInventario) snavInventario.style.display = 'none';
+  } else {
+    if (snavChecklist) snavChecklist.style.display = '';
+    if (snavInventario) snavInventario.style.display = '';
+  }
+  // Admin vê tudo + painel de empresas
+  if (snavAdmin) snavAdmin.style.display = PERFIL === 'admin' ? '' : 'none';
+}
+function doLogout(){clearToken();S={responses:[],inventory:[],actions:[],checklist:{},relatos:[]};showScreen('colab');}
+function savePw(){
+  const p1=document.getElementById('cfg-pw1').value;
+  const p2=document.getElementById('cfg-pw2').value;
+  const msg=document.getElementById('pw-msg');
+  if(!p1){msg.style.color='var(--rd)';msg.textContent='Digite uma senha.';return;}
+  if(p1!==p2){msg.style.color='var(--rd)';msg.textContent='As senhas não coincidem.';return;}
+  if(p1.length<4){msg.style.color='var(--rd)';msg.textContent='Mínimo 4 caracteres.';return;}
+  S.pw=p1;ss();
+  msg.style.color='var(--gd)';msg.textContent='Senha alterada com sucesso!';
+  document.getElementById('cfg-pw1').value='';
+  document.getElementById('cfg-pw2').value='';
+}
+function clearAll(){
+  if(confirm('Apagar TODOS os dados permanentemente? Esta ação não pode ser desfeita.')){
+    const pw=S.pw;
+    S={responses:[],inventory:[],actions:[],checklist:{},relatos:[],pw};
+    ss();renderDashboard();alert('Dados apagados.');
+  }
+}
+
+// ══════════════════════════════════════════════
+// NAVEGAÇÃO RH
+// ══════════════════════════════════════════════
+const RH_TITLES={dashboard:'Dashboard',resultados:'Resultados',checklist:'Checklist NR-1',inventario:'Inventário de Riscos',plano:'Plano de Ação',relatos:'Relatos Confidenciais',compartilhar:'Compartilhar',pdf:'Exportar PDF',config:'Configurações'};
+function rhGoto(id){
+  closeMore();closeSb();
+  document.querySelectorAll('.rh-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('rh-page-'+id).classList.add('active');
+  document.getElementById('rh-page-title').textContent=RH_TITLES[id]||id;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('snav-'+id);if(nb)nb.classList.add('active');
+  const BN_MAP={dashboard:'bn-dashboard',resultados:'bn-resultados',pdf:'bn-pdf'};
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  const bb=document.getElementById(BN_MAP[id]||'bn-more');if(bb)bb.classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='resultados')renderResultados();
+  if(id==='checklist')renderChecklist();
+  if(id==='inventario')renderInventory();
+  if(id==='plano')renderPlano();
+  if(id==='relatos')renderRelatos();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════
+// MOBILE NAV
+// ══════════════════════════════════════════════
+function toggleSb(){
+  const sb=document.getElementById('rh-sidebar');
+  const ov=document.getElementById('sb-overlay');
+  const hb=document.getElementById('hb-btn');
+  sb.classList.toggle('open');ov.classList.toggle('open');hb.classList.toggle('open');
+}
+function closeSb(){
+  document.getElementById('rh-sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+  document.getElementById('hb-btn').classList.remove('open');
+}
+function openMore(){
+  document.getElementById('more-sheet').classList.add('open');
+  document.getElementById('more-overlay').classList.add('open');
+}
+function closeMore(){
+  document.getElementById('more-sheet').classList.remove('open');
+  document.getElementById('more-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// FORMULÁRIO COLABORADOR
+// ══════════════════════════════════════════════
+let cStep=0,cAns={},cAsAns={},cIdent=null,cIdentOn=false,cSetor='',cOnAs=false;
+function colabStart(){
+  cSetor=document.getElementById('c-setor').value||'Não informado';
+  cAns={};cAsAns={};cIdent=null;cIdentOn=false;cStep=0;cOnAs=false;
+  document.getElementById('colab-intro').classList.remove('show');
+  document.getElementById('colab-form').classList.add('show');
+  document.getElementById('colab-done').classList.remove('show');
+  document.getElementById('colab-assedio').style.display='none';
+  cBuild();
+}
+function cBuild(){
+  const d=DIMS[cStep],tot=DIMS.length,pct=Math.round((cStep/tot)*100);
+  document.getElementById('cp-label').textContent=`Dimensão ${cStep+1} de ${tot}: ${d.name}`;
+  document.getElementById('cp-pct').textContent=pct+'%';
+  document.getElementById('cp-bar').style.width=pct+'%';
+  document.getElementById('cb-prev').style.display=cStep>0?'inline-flex':'none';
+  document.getElementById('cb-next').textContent=cStep<tot-1?'Próxima →':'Seção confidencial →';
+  document.getElementById('colab-assedio').style.display='none';
+  let h='';
+  d.qs.forEach(q=>{
+    const sv=cAns[q.id];
+    h+=`<div class="qcard"><div class="qdim">${d.name}</div><div class="qlabel">${q.text}</div><div class="likert">`;
+    OPTS.forEach((o,i)=>h+=`<div class="lopt"><input type="radio" name="${q.id}" id="${q.id}_${i}" value="${o.val}" ${sv===o.val?'checked':''}><label for="${q.id}_${i}">${o.label}</label></div>`);
+    h+=`</div></div>`;
+  });
+  document.getElementById('colab-steps').innerHTML=h;
+}
+function cBuildAs(){
+  document.getElementById('colab-steps').innerHTML='';
+  document.getElementById('colab-assedio').style.display='block';
+  document.getElementById('cp-label').textContent='Seção confidencial: Assédio Sexual';
+  document.getElementById('cp-pct').textContent='95%';
+  document.getElementById('cp-bar').style.width='95%';
+  document.getElementById('cb-prev').style.display='inline-flex';
+  document.getElementById('cb-next').textContent='Finalizar ✓';
+  let h='';
+  AS_QS.forEach(q=>{
+    h+=`<div class="qcard pu"><div class="qdim" style="color:var(--pu)">Assédio Sexual</div><div class="qlabel">${q.text}</div><div class="likert">`;
+    q.opts.forEach((o,i)=>h+=`<div class="lopt lopt-pu"><input type="radio" name="${q.id}" id="${q.id}_${i}" value="${i}" ${cAsAns[q.id]===i?'checked':''}><label for="${q.id}_${i}">${o}</label></div>`);
+    h+=`</div></div>`;
+  });
+  document.getElementById('assedio-qs').innerHTML=h;
+  const tr=document.getElementById('tog-track');
+  if(cIdentOn){tr.classList.add('on');document.getElementById('id-fields').classList.add('show');document.getElementById('tog-lbl').textContent='Quero me identificar';}
+  else{tr.classList.remove('on');document.getElementById('id-fields').classList.remove('show');document.getElementById('tog-lbl').textContent='Prefiro permanecer anônimo(a)';}
+}
+function toggleId(){
+  cIdentOn=!cIdentOn;
+  const tr=document.getElementById('tog-track');
+  if(cIdentOn){tr.classList.add('on');document.getElementById('id-fields').classList.add('show');document.getElementById('tog-lbl').textContent='Quero me identificar';}
+  else{tr.classList.remove('on');document.getElementById('id-fields').classList.remove('show');document.getElementById('tog-lbl').textContent='Prefiro permanecer anônimo(a)';}
+}
+function cSaveAns(){DIMS[cStep].qs.forEach(q=>{const s=document.querySelector(`input[name="${q.id}"]:checked`);if(s)cAns[q.id]=parseInt(s.value);});}
+function cSaveAs(){AS_QS.forEach(q=>{const s=document.querySelector(`input[name="${q.id}"]:checked`);if(s)cAsAns[q.id]=parseInt(s.value);});}
+function colabPrev(){
+  if(cOnAs){cOnAs=false;cStep=DIMS.length-1;cBuild();}
+  else if(cStep>0){cSaveAns();cStep--;cBuild();}
+}
+function colabNext(){
+  if(cOnAs){
+    cSaveAs();
+    if(cIdentOn){cIdent={nome:document.getElementById('id-nome').value,contato:document.getElementById('id-contato').value,desc:document.getElementById('id-desc').value};}
+    cSubmit();
+  } else {
+    cSaveAns();
+    const ua=DIMS[cStep].qs.filter(q=>cAns[q.id]===undefined);
+    if(ua.length){alert('Por favor, responda todas as perguntas desta dimensão.');return;}
+    if(cStep<DIMS.length-1){cStep++;cBuild();}
+    else{cOnAs=true;cBuildAs();}
+  }
+}
+async function cSubmit(){
+  const scores={};
+  DIMS.forEach(d=>{
+    let sum=0;
+    d.qs.forEach(q=>{const r=cAns[q.id]||0;sum+=q.inv?(4-r):r;});
+    scores[d.id]=Math.round((sum/(d.qs.length*4))*100);
+  });
+  const overall=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/DIMS.length);
+  // Envia para API
+  const relatoPayload = (Object.keys(cAsAns).length > 0 || cIdent) ? {respostas:cAsAns, identificacao:cIdent} : null;
+  await api('/api/avaliacoes','POST',{
+    empresaId: EMPRESA_ID,
+    setor: cSetor,
+    respostas: cAns,
+    scores,
+    scoreGeral: overall,
+    relatoAssedio: relatoPayload
+  });
+  S.responses.push({date:new Date().toISOString(),setor:cSetor,scores,overall});
+  // Auto-inventário local (cache)
+  DIMS.forEach(d=>{
+    const sc=scores[d.id];
+    if(sc>=40){
+      const m=DIM_RISK_MAP[d.id];
+      let sev=m.sev,prob=m.prob;
+      if(sc>=70){sev=Math.min(4,m.sev+1);prob=Math.min(3,m.prob+1);}
+      else if(sc>=55){prob=Math.min(3,m.prob+1);}
+      const exists=S.inventory.some(r=>r.origem===d.id&&r.setor===cSetor);
+      if(!exists)S.inventory.push({perigo:m.perigo,agravos:m.agravos,setor:cSetor,sev,prob,medidas:m.medidas,origem:d.id,origemScore:sc,date:new Date().toISOString(),auto:true});
+      else{const idx=S.inventory.findIndex(r=>r.origem===d.id&&r.setor===cSetor);if(idx>=0){S.inventory[idx].sev=sev;S.inventory[idx].prob=prob;S.inventory[idx].origemScore=sc;}}
+    }
+  });
+  // Relato assédio sexual
+  const hasAs=Object.values(cAsAns).some(v=>v>0);
+  if(hasAs||cIdent){
+    S.relatos.push({date:new Date().toISOString(),setor:cSetor,respostas:cAsAns,identificacao:cIdent});
+    if(hasAs){
+      const ex=S.inventory.some(r=>r.origem==='assedio_sexual'&&r.setor===cSetor);
+      if(!ex)S.inventory.push({perigo:'Assédio sexual no trabalho',agravos:'Transtornos mentais graves, PTSD, trauma',setor:cSetor,sev:4,prob:3,medidas:'Investigação sigilosa; suporte psicológico; Comitê de Ética; comunicação ao Jurídico',origem:'assedio_sexual',origemScore:100,date:new Date().toISOString(),auto:true});
+    }
+  }
+  ss();
+  cShowResult({scores,overall});
+}
+function cShowResult(r){
+  document.getElementById('colab-form').classList.remove('show');
+  document.getElementById('colab-done').classList.add('show');
+  document.getElementById('done-score').textContent=r.overall+'%';
+  const lv=r.overall<30?['Baixo','g']:r.overall<55?['Moderado','a']:['Elevado','r'];
+  document.getElementById('done-badge').innerHTML=`<span class="tag ${lv[1]}" style="font-size:13px;padding:5px 14px">Risco ${lv[0]}</span>`;
+  let h='';
+  DIMS.forEach(d=>{
+    const sc=r.scores[d.id];
+    const c=sc<30?'var(--g)':sc<55?'var(--am)':'var(--rd)';
+    h+=`<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px"><div style="flex:1"><div style="font-weight:500;font-size:13px;margin-bottom:7px">${d.name}</div><div class="gauge-wrap"><div class="gauge-fill" style="width:${sc}%;background:${c}"></div></div><div class="gauge-lbls"><span>Baixo</span><span>Alto</span></div></div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:${c};min-width:48px;text-align:right">${sc}%</div></div></div>`;
+  });
+  h+=`<div style="background:var(--pul);border:1px solid #C4B5FD;border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--pu);margin-top:6px">🔒 Seção de assédio sexual registrada separadamente com sigilo.</div>`;
+  document.getElementById('done-dims').innerHTML=h;
+}
+function colabReset(){
+  cAns={};cAsAns={};cIdent=null;cIdentOn=false;cStep=0;cOnAs=false;cSetor='';
+  document.getElementById('colab-intro').classList.add('show');
+  document.getElementById('colab-form').classList.remove('show');
+  document.getElementById('colab-done').classList.remove('show');
+  document.getElementById('c-setor').value='';
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD RH
+// ══════════════════════════════════════════════
+function renderDashboard(){
+  updateStats();
+  const hasAs=(S.relatos||[]).filter(r=>Object.values(r.respostas||{}).some(v=>v>0));
+  const aw=document.getElementById('dash-assedio-alert');
+  aw.innerHTML=hasAs.length?`<div class="alert purple" style="margin-bottom:14px"><span style="font-size:20px">⚠️</span><div style="flex:1"><strong>${hasAs.length} relato(s) de assédio sexual</strong> com indicação de ocorrência.</div><button class="btn btn-pu" onclick="rhGoto('relatos')" style="font-size:12px;padding:7px 12px;flex-shrink:0">Ver →</button></div>`:'';
+  if(!S.responses.length){document.getElementById('dash-bars').innerHTML='<div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhuma avaliação respondida ainda.</div>';return;}
+  const avg={};
+  DIMS.forEach(d=>{const vs=S.responses.map(r=>r.scores[d.id]||0);avg[d.id]=Math.round(vs.reduce((a,b)=>a+b,0)/vs.length);});
+  let h='';
+  DIMS.forEach(d=>{
+    const sc=avg[d.id];const c=sc<30?'var(--g)':sc<55?'var(--am)':'var(--rd)';
+    h+=`<div class="risk-row"><div class="risk-name">${d.name}</div><div class="risk-bar-wrap"><div class="risk-bar" style="width:${sc}%;background:${c}"></div></div><div class="risk-pct" style="color:${c}">${sc}%</div></div>`;
+  });
+  document.getElementById('dash-bars').innerHTML=h;
+}
+function updateStats(){
+  document.getElementById('st-aval').textContent=S.responses.length;
+  document.getElementById('st-risco').textContent=S.inventory.length;
+  const all=CL_DATA.reduce((a,s)=>a+s.items.length,0);
+  const done=Object.values(S.checklist).filter(Boolean).length;
+  document.getElementById('st-pend').textContent=all-done;
+  document.getElementById('st-conf').textContent=all?Math.round((done/all)*100)+'%':'0%';
+}
+
+// ══════════════════════════════════════════════
+// RESULTADOS RH
+// ══════════════════════════════════════════════
+function renderResultados(){
+  if(!S.responses.length){document.getElementById('res-body').innerHTML='<div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhuma avaliação respondida ainda.</div>';return;}
+  let h='<table><thead><tr><th>Data</th><th>Setor</th><th>Índice</th><th>Nível</th><th class="hide-m">Dimensão mais crítica</th></tr></thead><tbody>';
+  S.responses.forEach(r=>{
+    const d=new Date(r.date).toLocaleDateString('pt-BR');
+    const lv=r.overall<30?['Baixo','g']:r.overall<55?['Moderado','a']:['Elevado','r'];
+    const w=Object.entries(r.scores).sort((a,b)=>b[1]-a[1])[0];
+    const wn=DIMS.find(d=>d.id===w[0])?.name||w[0];
+    h+=`<tr><td>${d}</td><td>${r.setor}</td><td><strong>${r.overall}%</strong></td><td><span class="tag ${lv[1]}">${lv[0]}</span></td><td class="hide-m">${wn} (${w[1]}%)</td></tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('res-body').innerHTML=h;
+}
+
+// ══════════════════════════════════════════════
+// CHECKLIST
+// ══════════════════════════════════════════════
+function renderChecklist(){
+  let total=0,done=0;
+  CL_DATA.forEach(s=>s.items.forEach(i=>{total++;if(S.checklist[i.id])done++;}));
+  const pct=total?Math.round((done/total)*100):0;
+  document.getElementById('cl-pct').textContent=pct+'%';
+  document.getElementById('cl-bar').style.width=pct+'%';
+  let h='';
+  CL_DATA.forEach(s=>{
+    const sd=s.items.filter(i=>S.checklist[i.id]).length;
+    h+=`<div class="cl-sec"><div class="cl-sec-title"><span>${s.sec}</span><span class="tag ${sd===s.items.length?'g':'gy'}">${sd}/${s.items.length}</span></div>`;
+    s.items.forEach(i=>h+=`<div class="cl-item ${S.checklist[i.id]?'done':''}" onclick="toggleCL('${i.id}')"><div class="cl-check">${S.checklist[i.id]?'✓':''}</div><div><div class="cl-text">${i.text}</div><div class="cl-ref">${i.ref}</div></div></div>`);
+    h+='</div>';
+  });
+  document.getElementById('cl-body').innerHTML=h;
+  updateStats();
+}
+async function toggleCL(id){
+  const novo = !S.checklist[id];
+  S.checklist[id] = novo;
+  await api('/api/checklist','POST',{itemId:id,concluido:novo});
+  renderChecklist();
+}
+
+// ══════════════════════════════════════════════
+// INVENTÁRIO
+// ══════════════════════════════════════════════
+function renderInventory(){
+  if(!S.inventory.length){document.getElementById('inv-body').innerHTML='<div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhum risco registrado. Complete uma avaliação para gerar riscos automaticamente.</div>';return;}
+  const autos=S.inventory.filter(r=>r.auto);
+  const manuais=S.inventory.filter(r=>!r.auto);
+  let h='';
+  if(autos.length){
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="height:1px;flex:1;background:var(--br)"></div><span style="font-size:10px;color:var(--t3);white-space:nowrap;padding:0 8px">GERADOS AUTOMATICAMENTE PELO COPSOQ II</span><div style="height:1px;flex:1;background:var(--br)"></div></div>`;
+    autos.forEach(r=>h+=riskCard(r,S.inventory.indexOf(r)));
+  }
+  if(manuais.length){
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px"><div style="height:1px;flex:1;background:var(--br)"></div><span style="font-size:10px;color:var(--t3);white-space:nowrap;padding:0 8px">ADICIONADOS MANUALMENTE</span><div style="height:1px;flex:1;background:var(--br)"></div></div>`;
+    manuais.forEach(r=>h+=riskCard(r,S.inventory.indexOf(r)));
+  }
+  document.getElementById('inv-body').innerHTML=h;
+  updateStats();
+}
+function riskCard(r,i){
+  const lv=r.sev*r.prob;const lbl=lv<=2?'Baixo':lv<=4?'Moderado':lv<=6?'Alto':'Crítico';const c=lv<=2?'g':lv<=4?'a':'r';
+  const sc=r.auto&&r.origemScore!==undefined?`<span class="tag ${r.origemScore>=70?'r':'a'}" style="font-size:10px">COPSOQ ${r.origemScore}%</span>`:'';
+  const ab=r.auto?`<span class="tag bl" style="font-size:10px">AUTO</span>`:'';
+  return `<div class="inv-item" style="${r.auto?'border-left:3px solid var(--bl)':''}">
+    <div class="inv-hdr"><div style="flex:1"><div style="display:flex;gap:5px;margin-bottom:4px;flex-wrap:wrap">${ab}${sc}</div><div class="inv-title">${r.perigo}</div></div><span class="tag ${c}">${lbl}</span><button onclick="delInv(${i})" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px;padding:0 4px;flex-shrink:0">×</button></div>
+    ${r.agravos?`<div style="font-size:12px;color:var(--t2);margin-bottom:5px"><strong>Agravos:</strong> ${r.agravos}</div>`:''}
+    <div style="font-size:12px;color:var(--t2)">${r.medidas?'<strong>Medidas:</strong> '+r.medidas:''}</div>
+    <div class="inv-meta"><span>Setor: ${r.setor||'—'}</span><span>Sev: ${['','Leve','Mod.','Alta','Crítica'][r.sev]}</span><span>Prob: ${['','Baixa','Média','Alta'][r.prob]}</span></div>
+  </div>`;
+}
+function showAddRisk(){document.getElementById('add-risk-form').style.display='block';}
+function cancelRisk(){document.getElementById('add-risk-form').style.display='none';}
+async function saveRisk(){
+  const p=document.getElementById('r-perigo').value;if(!p){alert('Selecione o perigo');return;}
+  await api('/api/inventario','POST',{
+    perigo:p, setor:document.getElementById('r-setor').value,
+    severidade:parseInt(document.getElementById('r-sev').value),
+    probabilidade:parseInt(document.getElementById('r-prob').value),
+    medidas:document.getElementById('r-med').value
+  });
+  await loadData();cancelRisk();renderInventory();
+}
+async function delInv(i){
+  if(confirm('Remover este risco?')){
+    await api(`/api/inventario?id=${S.inventory[i].id}`,'DELETE');
+    await loadData();renderInventory();
+  }
+}
+
+// ══════════════════════════════════════════════
+// PLANO DE AÇÃO
+// ══════════════════════════════════════════════
+function renderPlano(){
+  if(!S.actions.length){document.getElementById('plano-body').innerHTML='<div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhuma ação registrada.</div>';return;}
+  let h='<table><thead><tr><th>Ação</th><th class="hide-m">Responsável</th><th>Prazo</th><th>Prio.</th><th>Status</th><th></th></tr></thead><tbody>';
+  S.actions.forEach((a,i)=>{
+    const c=a.prioridade==='Alta'?'r':a.prioridade==='Média'?'a':'g';
+    h+=`<tr><td>${a.acao}</td><td class="hide-m">${a.responsavel||'—'}</td><td style="white-space:nowrap">${a.prazo||'—'}</td><td><span class="tag ${c}">${a.prioridade}</span></td><td><select onchange="updAct(${i},this.value)" style="border:1px solid var(--br);border-radius:6px;padding:4px 8px;font-size:12px;font-family:'Inter',sans-serif;background:#fff"><option ${a.status==='Pendente'?'selected':''}>Pendente</option><option ${a.status==='Em andamento'?'selected':''}>Em andamento</option><option ${a.status==='Concluído'?'selected':''}>Concluído</option></select></td><td><button onclick="delAct(${i})" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px">×</button></td></tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('plano-body').innerHTML=h;
+}
+function showAddAction(){document.getElementById('add-action-form').style.display='block';}
+function cancelAction(){document.getElementById('add-action-form').style.display='none';}
+async function saveAction(){
+  const a=document.getElementById('a-acao').value;if(!a){alert('Descreva a ação');return;}
+  await api('/api/plano','POST',{
+    acao:a, responsavel:document.getElementById('a-resp').value,
+    prazo:document.getElementById('a-prazo').value||null,
+    prioridade:document.getElementById('a-prio').value
+  });
+  await loadData();cancelAction();renderPlano();
+}
+async function updAct(i,v){
+  const a=S.actions[i];
+  await api('/api/plano','PUT',{id:a.id,status:v,acao:a.acao,responsavel:a.responsavel,prazo:a.prazo,prioridade:a.prioridade});
+  S.actions[i].status=v;
+}
+async function delAct(i){
+  if(confirm('Remover?')){
+    await api(`/api/plano?id=${S.actions[i].id}`,'DELETE');
+    await loadData();renderPlano();
+  }
+}
+
+// ══════════════════════════════════════════════
+// RELATOS
+// ══════════════════════════════════════════════
+const AS_OPTS_LBL=['Nunca','Uma vez','Algumas vezes','Frequentemente'];
+async function renderRelatos(){
+  try {
+    const result = await api(`/api/relatos?empresaId=${EMPRESA_ID}`);
+    S.relatos = result.relatos || [];
+  } catch(e) { console.error(e); }
+  const rel=S.relatos||[];
+  document.getElementById('relatos-cnt').textContent=rel.length+' relato'+(rel.length===1?'':'s');
+  if(!rel.length){document.getElementById('relatos-body').innerHTML='<div style="color:var(--t3);font-size:13px;padding:12px 0;text-align:center">Nenhum relato registrado.</div>';return;}
+  let h='';
+  rel.forEach((r,i)=>{
+    const d=new Date(r.date).toLocaleDateString('pt-BR');
+    const temOc=Object.values(r.respostas||{}).some(v=>v>0);
+    h+=`<div class="relato-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <strong style="flex:1">Relato #${i+1} — ${d}</strong>
+        <span class="tag ${temOc?'r':'gy'}">${temOc?'Indicação de ocorrência':'Sem ocorrência'}</span>
+        <span class="tag ${r.identificacao?'pu':'gy'}">${r.identificacao?'Identificado':'Anônimo'}</span>
+        <button onclick="delRelato(${i})" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px;padding:0">×</button>
+      </div>
+      <div class="inv-meta" style="margin-bottom:8px"><span>Setor: ${r.setor||'—'}</span></div>`;
+    if(r.identificacao&&(r.identificacao.nome||r.identificacao.contato)){
+      h+=`<div style="background:var(--pul);border:1px solid #C4B5FD;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:8px">
+        <strong style="color:#5B21B6">🔒 Dados confidenciais</strong><br>
+        ${r.identificacao.nome?`Nome: <strong>${r.identificacao.nome}</strong><br>`:''}
+        ${r.identificacao.contato?`Contato: <strong>${r.identificacao.contato}</strong><br>`:''}
+        ${r.identificacao.desc?`Relato: ${r.identificacao.desc}`:''}
+      </div>`;
+    }
+    if(r.respostas&&Object.keys(r.respostas).length){
+      h+=`<table><thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead><tbody>`;
+      AS_QS.forEach(q=>{
+        if(r.respostas[q.id]!==undefined){
+          const ol=q.opts[r.respostas[q.id]]||'—';
+          const hi=r.respostas[q.id]>0?'color:var(--pu);font-weight:500':'';
+          h+=`<tr><td style="max-width:300px;font-size:12px">${q.text}</td><td style="${hi};font-size:12px">${ol}</td></tr>`;
+        }
+      });
+      h+=`</tbody></table>`;
+    }
+    h+='</div>';
+  });
+  document.getElementById('relatos-body').innerHTML=h;
+}
+async function delRelato(i){
+  if(confirm('Remover permanentemente?')){
+    await api(`/api/relatos?id=${S.relatos[i].id}`,'DELETE');
+    renderRelatos();
+  }
+}
+
+// ══════════════════════════════════════════════
+// QR CODE
+// ══════════════════════════════════════════════
+function updateQR(){
+  const url=document.getElementById('share-url').value.trim();
+  if(!url){alert('Informe a URL');return;}
+  const c=document.getElementById('qr-container');c.innerHTML='';
+  try{
+    new QRCode(c,{text:url,width:200,height:200,colorDark:'#161510',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+    document.getElementById('qr-lbl').textContent='QR Code gerado. Aponte a câmera para ler.';
+    document.getElementById('btn-dl-qr').style.display='inline-flex';
+  }catch(e){c.innerHTML='<div style="color:var(--rd);font-size:13px">Erro ao gerar QR.</div>';}
+}
+function shareWpp(){
+  const url=document.getElementById('share-url').value.trim();
+  const msg=encodeURIComponent('Olá! Por favor, responda o questionário de riscos psicossociais da nossa empresa (NR-1). É anônimo e leva ~12 minutos:\n\n'+url);
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+function printQR(){
+  const canvas=document.querySelector('#qr-container canvas');
+  if(!canvas){alert('Gere o QR Code primeiro.');return;}
+  const url=document.getElementById('share-url').value.trim();
+  const w=window.open('','_blank');
+  w.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;gap:14px;padding:40px"><h2 style="color:#0F6E56">GRO Psicossocial — NR-1</h2><p>Avaliação de Riscos Psicossociais — responda o questionário:</p><img src="${canvas.toDataURL()}" style="width:240px;height:240px"><p style="font-size:13px;color:#666">${url}</p></body></html>`);
+  w.document.close();w.print();
+}
+function dlQR(){
+  const canvas=document.querySelector('#qr-container canvas');
+  if(!canvas)return;
+  const a=document.createElement('a');a.download='qr-gro-psicossocial.png';a.href=canvas.toDataURL();a.click();
+}
+
+// ══════════════════════════════════════════════
+// EXPORTAR PDF
+// ══════════════════════════════════════════════
+function generatePDF(){
+  const empresa=document.getElementById('pdf-empresa').value||'[Nome da Empresa]';
+  const cnpj=document.getElementById('pdf-cnpj').value||'';
+  const resp=document.getElementById('pdf-resp').value||'';
+  const periodo=document.getElementById('pdf-periodo').value||new Date().toLocaleDateString('pt-BR');
+  const prev=document.getElementById('pdf-preview');
+
+  // Scores médios
+  const avg={};
+  if(S.responses.length){
+    DIMS.forEach(d=>{const vs=S.responses.map(r=>r.scores[d.id]||0);avg[d.id]=Math.round(vs.reduce((a,b)=>a+b,0)/vs.length);});
+  }
+
+  // Resumo executivo
+  const criticos=DIMS.filter(d=>avg[d.id]>=55).sort((a,b)=>(avg[b.id]||0)-(avg[a.id]||0));
+  const moderados=DIMS.filter(d=>avg[d.id]>=40&&avg[d.id]<55);
+  const overall=S.responses.length?Math.round(Object.values(avg).reduce((a,b)=>a+b,0)/DIMS.length):0;
+  const lvl=overall<30?'Baixo risco':overall<55?'Risco moderado':'Risco elevado';
+
+  // All items checklist
+  const allCL=CL_DATA.reduce((a,s)=>a+s.items.length,0);
+  const doneCL=Object.values(S.checklist).filter(Boolean).length;
+  const confPct=allCL?Math.round((doneCL/allCL)*100):0;
+
+  let h=`<div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-g" onclick="printPDF()" style="font-size:13px">🖨️ Imprimir / Salvar PDF</button>
+    <button class="btn btn-out" onclick="document.getElementById('pdf-preview').style.display='none'" style="font-size:13px">✕ Fechar</button>
+  </div>
+  <div id="pdf-preview-content" style="background:#fff;padding:32px;font-size:13px;line-height:1.6;border:1px solid var(--br);border-radius:var(--rl2)">
+
+  <!-- CAPA -->
+  <div style="text-align:center;padding:40px 0 32px;border-bottom:2px solid var(--g);margin-bottom:28px">
+    <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--gd)">GRO Psicossocial — NR-1</div>
+    <div style="font-size:18px;font-weight:600;margin:12px 0 4px">${empresa}</div>
+    ${cnpj?`<div style="font-size:13px;color:var(--t3)">CNPJ: ${cnpj}</div>`:''}
+    <div style="font-size:13px;color:var(--t3);margin-top:4px">Período: ${periodo}</div>
+    ${resp?`<div style="font-size:13px;color:var(--t3)">Responsável: ${resp}</div>`:''}
+    <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:var(--gl);padding:8px 20px;border-radius:20px"><span style="font-size:22px;font-family:'Syne',sans-serif;font-weight:700;color:var(--gd)">${overall}%</span><span style="font-size:13px;color:var(--gd)">${lvl}</span></div>
+    <div style="margin-top:8px;font-size:12px;color:var(--t3)">Baseado em ${S.responses.length} avaliação(ões) respondida(s)</div>
+    <div style="margin-top:6px;font-size:11px;color:var(--t3)">Gerado em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    <div style="margin-top:6px;font-size:11px;color:var(--t3)">Portaria MTE nº 1.416/2024 | NR-1 + NR-17 | COPSOQ II</div>
+  </div>
+
+  <!-- RESUMO EXECUTIVO -->
+  <div style="margin-bottom:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px">1. Resumo Executivo</div>
+    ${criticos.length?criticos.map(d=>`<div style="padding:10px 14px;border-radius:8px;margin-bottom:7px;background:var(--rl);border-left:3px solid var(--rd);font-size:13px"><strong>🔴 CRÍTICO — ${d.name} (${avg[d.id]}%)</strong><br>${DIM_RISK_MAP[d.id].medidas}</div>`).join(''):''}
+    ${moderados.length?moderados.map(d=>`<div style="padding:10px 14px;border-radius:8px;margin-bottom:7px;background:var(--al);border-left:3px solid var(--am);font-size:13px"><strong>🟡 MODERADO — ${d.name} (${avg[d.id]}%)</strong><br>${DIM_RISK_MAP[d.id].medidas}</div>`).join(''):''}
+    ${!criticos.length&&!moderados.length?`<div style="padding:10px 14px;border-radius:8px;background:var(--gl);border-left:3px solid var(--g);font-size:13px">✅ Nenhuma dimensão atingiu limiar de risco moderado nas avaliações realizadas.</div>`:''}
+  </div>
+
+  <!-- GRÁFICO COPSOQ II -->
+  ${S.responses.length?`<div style="margin-bottom:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px">2. Perfil de Risco — Dimensões COPSOQ II</div>
+    ${DIMS.map(d=>{const sc=avg[d.id]||0;const c=sc<30?'#1D9E75':sc<55?'#BA7517':'#E24B4A';return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:210px;font-size:12px;flex-shrink:0">${d.name}</div><div style="flex:1;height:14px;background:var(--grl);border-radius:99px;overflow:hidden"><div style="width:${sc}%;height:100%;background:${c};border-radius:99px"></div></div><div style="width:36px;text-align:right;font-size:12px;font-weight:600;color:${c};flex-shrink:0">${sc}%</div></div>`;}).join('')}
+    <div style="font-size:11px;color:var(--t3);margin-top:8px">Escala 0–100 · Verde &lt;30% (baixo) · Amarelo 30–54% (moderado) · Vermelho ≥55% (elevado)</div>
+  </div>`:''}
+
+  <!-- INVENTÁRIO -->
+  ${S.inventory.length?`<div style="margin-bottom:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px">3. Inventário de Riscos Psicossociais</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#0F6E56;color:#fff"><th style="padding:8px 10px;text-align:left">Perigo</th><th style="padding:8px 10px">Setor</th><th style="padding:8px 10px">Nível</th><th style="padding:8px 10px;text-align:left">Medidas</th></tr></thead><tbody>
+    ${S.inventory.map((r,i)=>{const lv=r.sev*r.prob;const lbl=lv<=2?'Baixo':lv<=4?'Moderado':lv<=6?'Alto':'Crítico';const bg=i%2===0?'#fff':'#F1EFE8';return `<tr style="background:${bg}"><td style="padding:8px 10px">${r.perigo}</td><td style="padding:8px 10px;text-align:center">${r.setor||'—'}</td><td style="padding:8px 10px;text-align:center"><strong>${lbl}</strong></td><td style="padding:8px 10px">${r.medidas||'—'}</td></tr>`;}).join('')}
+    </tbody></table>
+  </div>`:''}
+
+  <!-- PLANO DE AÇÃO -->
+  ${S.actions.length?`<div style="margin-bottom:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px">4. Plano de Ação PGR</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#0F6E56;color:#fff"><th style="padding:8px 10px;text-align:left">Ação</th><th style="padding:8px 10px">Responsável</th><th style="padding:8px 10px">Prazo</th><th style="padding:8px 10px">Prioridade</th><th style="padding:8px 10px">Status</th></tr></thead><tbody>
+    ${S.actions.map((a,i)=>{const bg=i%2===0?'#fff':'#F1EFE8';return `<tr style="background:${bg}"><td style="padding:8px 10px">${a.acao}</td><td style="padding:8px 10px;text-align:center">${a.responsavel||'—'}</td><td style="padding:8px 10px;text-align:center">${a.prazo||'—'}</td><td style="padding:8px 10px;text-align:center">${a.prioridade}</td><td style="padding:8px 10px;text-align:center">${a.status}</td></tr>`;}).join('')}
+    </tbody></table>
+  </div>`:''}
+
+  <!-- CHECKLIST -->
+  <div style="margin-bottom:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--gd);border-bottom:1px solid var(--br);padding-bottom:6px;margin-bottom:14px">5. Checklist de Conformidade NR-1 — ${confPct}% concluído (${doneCL}/${allCL})</div>
+    ${CL_DATA.map(s=>`<div style="margin-bottom:12px"><div style="font-weight:600;font-size:12px;margin-bottom:6px;color:var(--t2)">${s.sec}</div>${s.items.map(i=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--br);font-size:12px"><span style="color:${S.checklist[i.id]?'var(--gd)':'var(--t3)'};flex-shrink:0;font-size:14px">${S.checklist[i.id]?'☑':'☐'}</span><div>${i.text} <span style="color:var(--t3)">(${i.ref})</span></div></div>`).join('')}</div>`).join('')}
+  </div>
+
+  <div style="border-top:1px solid var(--br);padding-top:14px;font-size:11px;color:var(--t3);text-align:center">
+    Documento gerado pelo GRO Psicossocial NR-1 · Portaria MTE nº 1.416/2024 · Vigência 26/05/2026<br>
+    Este documento tem caráter orientativo. Em caso de dúvida, prevalece o texto oficial da NR-1 publicado no DOU.
+  </div>
+  </div>`;
+
+  prev.innerHTML=h;
+  prev.style.display='block';
+  setTimeout(()=>prev.scrollIntoView({behavior:'smooth'}),100);
+}
+function printPDF(){
+  const content=document.getElementById('pdf-preview-content');
+  if(!content){alert('Gere o relatório primeiro.');return;}
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>GRO Psicossocial — Relatório NR-1</title><style>body{font-family:Arial,sans-serif;font-size:12px;line-height:1.5;color:#1A1918;padding:20px}@media print{body{padding:0}}</style></head><body>${content.innerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.focus();w.print();},500);
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+try{document.getElementById('share-url').value=window.location.origin+'/';}catch(e){}
+
+// Inicializa banco de dados
+initDB();
+
+// Se já tem token válido, vai direto para o painel
+if (TOKEN && PERFIL) {
+  loadData().then(() => {
+    showScreen('rh');
+    renderDashboard();
+    atualizaMenuPerfil();
+    document.getElementById('rh-page-title').textContent='Dashboard';
+    document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  });
+}
+
+// PWA banner iOS
+window.addEventListener('load',()=>{
+  const isIos=/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isStandalone=window.navigator.standalone;
+  const dismissed=localStorage.getItem('pwa-dismissed');
+  if(isIos&&!isStandalone&&!dismissed){
+    const b=document.createElement('div');
+    b.style.cssText='position:fixed;bottom:16px;left:12px;right:12px;background:#1e1c17;color:#fff;border-radius:12px;padding:14px;z-index:99999;font-size:13px;line-height:1.5;box-shadow:0 4px 20px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1)';
+    b.innerHTML='<div style="display:flex;gap:10px;align-items:flex-start"><div style="flex:1"><strong style="color:#9FE1CB">Instale o GRO NR-1</strong><br>Toque em <strong>Compartilhar ⎋</strong> → <strong>"Adicionar à Tela de Início"</strong> para usar como app.</div><button onclick="this.closest(\'div\').parentElement.remove();localStorage.setItem(\'pwa-dismissed\',1)" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:22px;cursor:pointer;padding:0;line-height:1;flex-shrink:0">×</button></div>';
+    document.body.appendChild(b);
+  }
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+});
+</script>
+</body>
+</html>
