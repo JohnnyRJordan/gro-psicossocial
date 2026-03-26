@@ -1,25 +1,24 @@
-import { neon } from '@netlify/neon';
+const bodyData = JSON.parse(event.body || '{}');
+  const { neon } = require('@netlify/neon');
 
 const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 function getToken(req) {
-  return req.headers.get('authorization')?.replace('Bearer ', '');
+  return (event.headers['authorization'] || event.headers['Authorization'] || '')?.replace('Bearer ', '');
 }
 function decodeToken(token) {
   try { return JSON.parse(Buffer.from(token, 'base64').toString()); } catch { return null; }
 }
 
-export default async (req, context) => {
+exports.handler = async function(event, context) {
   const token = getToken(req);
   const payload = decodeToken(token);
   if (!payload || payload.exp < Date.now()) {
-    return new Response(JSON.stringify({ ok: false, error: 'Não autorizado' }), {
-      status: 401, headers: { 'Content-Type': 'application/json' }
-    });
+    return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false, error: 'Não autorizado' }) };
   }
 
-  const url = new URL(req.url);
-  const method = req.method;
+  const url = { searchParams: { get: (k) => { const p = new URLSearchParams(event.queryStringParameters || {}); return p.get(k); } } };
+  const method = event.httpMethod;
 
   // Listar todas as empresas (admin vê todas, RH/SST vê só a sua)
   if (method === 'GET') {
@@ -29,17 +28,14 @@ export default async (req, context) => {
     } else {
       empresas = await sql`SELECT * FROM empresas WHERE id = ${payload.empresaId}`;
     }
-    return new Response(JSON.stringify({ ok: true, empresas }), {
-      status: 200, headers: { 'Content-Type': 'application/json' }
-    });
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true, empresas }) };
   }
 
   // Criar nova empresa (apenas admin)
   if (method === 'POST' && payload.perfil === 'admin') {
-    const { nome, cnpj, endereco, setor_atividade, porte, senhaRH, senhaSST } = await req.json();
-    if (!nome) return new Response(JSON.stringify({ ok: false, error: 'Nome obrigatório' }), {
-      status: 400, headers: { 'Content-Type': 'application/json' }
-    });
+    const bodyData = JSON.parse(event.body || '{}');
+  const { nome, cnpj, endereco, setor_atividade, porte, senhaRH, senhaSST } = bodyData;
+    if (!nome) return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false, error: 'Nome obrigatório' }) };
 
     const result = await sql`
       INSERT INTO empresas (nome, cnpj, endereco, setor_atividade, porte)
@@ -56,27 +52,21 @@ export default async (req, context) => {
     await sql`INSERT INTO usuarios (empresa_id, nome, perfil, senha_hash) VALUES (${empresaId}, 'Gestor RH', 'rh', ${hashRH})`;
     await sql`INSERT INTO usuarios (empresa_id, nome, perfil, senha_hash) VALUES (${empresaId}, 'Técnico SST', 'sst', ${hashSST})`;
 
-    return new Response(JSON.stringify({ ok: true, empresaId }), {
-      status: 201, headers: { 'Content-Type': 'application/json' }
-    });
+    return { statusCode: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true, empresaId }) };
   }
 
   // Atualizar empresa
   if (method === 'PUT' && payload.perfil === 'admin') {
-    const { id, nome, cnpj, endereco, setor_atividade, porte } = await req.json();
+    const bodyData = JSON.parse(event.body || '{}');
+  const { id, nome, cnpj, endereco, setor_atividade, porte } = bodyData;
     await sql`
       UPDATE empresas SET nome=${nome}, cnpj=${cnpj}, endereco=${endereco},
       setor_atividade=${setor_atividade}, porte=${porte}
       WHERE id=${id}
     `;
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200, headers: { 'Content-Type': 'application/json' }
-    });
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: true }) };
   }
 
-  return new Response(JSON.stringify({ ok: false, error: 'Não permitido' }), {
-    status: 403, headers: { 'Content-Type': 'application/json' }
-  });
+  return { statusCode: 403, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false, error: 'Não permitido' }) };
 };
 
-export const config = { path: '/api/empresas' };

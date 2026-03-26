@@ -1,9 +1,10 @@
-export default async (req) => {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ok:false,error:'Método não permitido'}),{status:405,headers:{'Content-Type':'application/json'}});
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ok:false,error:'Método não permitido'}),{status:405,headers:{'Content-Type':'application/json'}});
   }
 
-  const { riscos, empresa, scores } = await req.json();
+  const bodyData = JSON.parse(event.body || '{}');
+  const { riscos, empresa, scores } = bodyData;
 
   const riscosTexto = riscos.map(r =>
     `- ${r.perigo} (Setor: ${r.setor||'Geral'}, Nível: ${r.severidade*r.probabilidade<=2?'Baixo':r.severidade*r.probabilidade<=4?'Moderado':r.severidade*r.probabilidade<=6?'Alto':'Crítico'}, COPSOQ: ${r.origem_score||'—'}%)`
@@ -62,10 +63,9 @@ Gere um plano de ação em JSON com o seguinte formato (responda APENAS o JSON, 
   try {
     const clean = text.replace(/```json|```/g, '').trim();
     const plano = JSON.parse(clean);
-    return new Response(JSON.stringify({ok:true,plano}),{status:200,headers:{'Content-Type':'application/json'}});
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ok:true,plano}),{status:200,headers:{'Content-Type':'application/json'}});
   } catch {
-    return new Response(JSON.stringify({ok:false,error:'Erro ao processar resposta da IA',raw:text}),{status:500,headers:{'Content-Type':'application/json'}});
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ok:false,error:'Erro ao processar resposta da IA',raw:text}),{status:500,headers:{'Content-Type':'application/json'}});
   }
 };
 
-export const config = { path: '/api/ia-plano' };

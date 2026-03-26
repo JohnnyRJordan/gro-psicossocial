@@ -1,34 +1,16 @@
-import { neon } from '@netlify/neon';
-const sql = neon(process.env.NETLIFY_DATABASE_URL);
-function decodeToken(t) { try { return JSON.parse(Buffer.from(t,'base64').toString()); } catch { return null; } }
-function auth(req) { const p=decodeToken(req.headers.get('authorization')?.replace('Bearer ','')); return p&&p.exp>Date.now()?p:null; }
-
-export default async (req) => {
-  const p = auth(req);
-  if (!p) return new Response(JSON.stringify({ok:false,error:'Não autorizado'}),{status:401,headers:{'Content-Type':'application/json'}});
-
-  const url = new URL(req.url);
-  const empresaId = url.searchParams.get('empresaId') || p.empresaId;
-
-  if (req.method === 'GET') {
-    const rows = await sql`SELECT * FROM plano_acao WHERE empresa_id=${empresaId} ORDER BY created_at DESC`;
-    return new Response(JSON.stringify({ok:true,acoes:rows}),{status:200,headers:{'Content-Type':'application/json'}});
-  }
-  if (req.method === 'POST') {
-    const {acao,responsavel,prazo,prioridade,inventarioId} = await req.json();
-    await sql`INSERT INTO plano_acao (empresa_id,inventario_id,acao,responsavel,prazo,prioridade) VALUES (${empresaId},${inventarioId||null},${acao},${responsavel},${prazo||null},${prioridade})`;
-    return new Response(JSON.stringify({ok:true}),{status:201,headers:{'Content-Type':'application/json'}});
-  }
-  if (req.method === 'PUT') {
-    const {id,status,acao,responsavel,prazo,prioridade} = await req.json();
-    await sql`UPDATE plano_acao SET status=${status},acao=${acao},responsavel=${responsavel},prazo=${prazo||null},prioridade=${prioridade},updated_at=NOW() WHERE id=${id} AND empresa_id=${empresaId}`;
-    return new Response(JSON.stringify({ok:true}),{status:200,headers:{'Content-Type':'application/json'}});
-  }
-  if (req.method === 'DELETE') {
-    const id = url.searchParams.get('id');
-    await sql`DELETE FROM plano_acao WHERE id=${id} AND empresa_id=${empresaId}`;
-    return new Response(JSON.stringify({ok:true}),{status:200,headers:{'Content-Type':'application/json'}});
-  }
-  return new Response(JSON.stringify({ok:false,error:'Método não permitido'}),{status:405,headers:{'Content-Type':'application/json'}});
+const { neon } = require('@netlify/neon');
+function decodeToken(t){try{return JSON.parse(Buffer.from(t||'','base64').toString());}catch{return null;}}
+exports.handler = async function(event,context){
+  const sql=neon(process.env.NETLIFY_DATABASE_URL);
+  const method=event.httpMethod;
+  const qs=event.queryStringParameters||{};
+  const auth=event.headers['authorization']||event.headers['Authorization']||'';
+  const p=decodeToken(auth.replace('Bearer ',''));
+  if(!p||p.exp<Date.now()) return {statusCode:401,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:false,error:'Não autorizado'})};
+  const empresaId=qs.empresaId||p.empresaId;
+  if(method==='GET'){const r=await sql`SELECT * FROM plano_acao WHERE empresa_id=${empresaId} ORDER BY created_at DESC`;return {statusCode:200,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:true,acoes:r})};}
+  if(method==='POST'){const{acao,responsavel,prazo,prioridade}=JSON.parse(event.body||'{}');await sql`INSERT INTO plano_acao (empresa_id,acao,responsavel,prazo,prioridade) VALUES (${empresaId},${acao},${responsavel},${prazo||null},${prioridade})`;return {statusCode:201,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:true})};}
+  if(method==='PUT'){const{id,status,acao,responsavel,prazo,prioridade}=JSON.parse(event.body||'{}');await sql`UPDATE plano_acao SET status=${status},acao=${acao},responsavel=${responsavel},prazo=${prazo||null},prioridade=${prioridade} WHERE id=${id} AND empresa_id=${empresaId}`;return {statusCode:200,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:true})};}
+  if(method==='DELETE'){const id=qs.id;await sql`DELETE FROM plano_acao WHERE id=${id} AND empresa_id=${empresaId}`;return {statusCode:200,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:true})};}
+  return {statusCode:405,headers:{'Content-Type':'application/json'},body:JSON.stringify({ok:false,error:'Método não permitido'})};
 };
-export const config = { path: '/api/plano' };

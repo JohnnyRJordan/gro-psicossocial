@@ -1,142 +1,31 @@
-import { neon } from '@netlify/neon';
+const { neon } = require('@netlify/neon');
 
-const sql = neon(process.env.NETLIFY_DATABASE_URL);
-
-export default async (req, context) => {
+exports.handler = async function(event, context) {
+  const sql = neon(process.env.NETLIFY_DATABASE_URL);
   try {
-    // EMPRESAS
-    await sql`
-      CREATE TABLE IF NOT EXISTS empresas (
-        id SERIAL PRIMARY KEY,
-        nome VARCHAR(255) NOT NULL,
-        cnpj VARCHAR(20),
-        endereco TEXT,
-        setor_atividade VARCHAR(255),
-        porte VARCHAR(50),
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
+    await sql`CREATE TABLE IF NOT EXISTS empresas (id SERIAL PRIMARY KEY, nome VARCHAR(255) NOT NULL, cnpj VARCHAR(20), created_at TIMESTAMPTZ DEFAULT NOW())`;
+    await sql`CREATE TABLE IF NOT EXISTS usuarios (id SERIAL PRIMARY KEY, empresa_id INTEGER, nome VARCHAR(255), perfil VARCHAR(20) NOT NULL, senha_hash VARCHAR(255) NOT NULL, ativo BOOLEAN DEFAULT true, created_at TIMESTAMPTZ DEFAULT NOW())`;
+    await sql`CREATE TABLE IF NOT EXISTS avaliacoes (id SERIAL PRIMARY KEY, empresa_id INTEGER, setor VARCHAR(255), respostas JSONB, scores JSONB NOT NULL, score_geral INTEGER NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW())`;
+    await sql`CREATE TABLE IF NOT EXISTS inventario (id SERIAL PRIMARY KEY, empresa_id INTEGER, perigo VARCHAR(500) NOT NULL, agravos TEXT, setor VARCHAR(255), severidade INTEGER, probabilidade INTEGER, medidas TEXT, origem VARCHAR(50), origem_score INTEGER, auto BOOLEAN DEFAULT false, created_at TIMESTAMPTZ DEFAULT NOW())`;
+    await sql`CREATE TABLE IF NOT EXISTS plano_acao (id SERIAL PRIMARY KEY, empresa_id INTEGER, acao TEXT NOT NULL, responsavel VARCHAR(255), prazo DATE, prioridade VARCHAR(20), status VARCHAR(30) DEFAULT 'Pendente', created_at TIMESTAMPTZ DEFAULT NOW())`;
+    await sql`CREATE TABLE IF NOT EXISTS checklist (id SERIAL PRIMARY KEY, empresa_id INTEGER, item_id VARCHAR(10) NOT NULL, concluido BOOLEAN DEFAULT false, UNIQUE(empresa_id, item_id))`;
+    await sql`CREATE TABLE IF NOT EXISTS relatos_assedio (id SERIAL PRIMARY KEY, empresa_id INTEGER, setor VARCHAR(255), respostas JSONB, identificacao JSONB, created_at TIMESTAMPTZ DEFAULT NOW())`;
 
-    // USUÁRIOS (perfis)
-    await sql`
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        nome VARCHAR(255),
-        email VARCHAR(255),
-        perfil VARCHAR(20) NOT NULL CHECK (perfil IN ('rh','sst','admin')),
-        senha_hash VARCHAR(255) NOT NULL,
-        ativo BOOLEAN DEFAULT true,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // AVALIAÇÕES COPSOQ II
-    await sql`
-      CREATE TABLE IF NOT EXISTS avaliacoes (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        setor VARCHAR(255),
-        respostas JSONB NOT NULL,
-        scores JSONB NOT NULL,
-        score_geral INTEGER NOT NULL,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // INVENTÁRIO DE RISCOS
-    await sql`
-      CREATE TABLE IF NOT EXISTS inventario (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        perigo VARCHAR(500) NOT NULL,
-        agravos TEXT,
-        setor VARCHAR(255),
-        severidade INTEGER NOT NULL,
-        probabilidade INTEGER NOT NULL,
-        medidas TEXT,
-        origem VARCHAR(50),
-        origem_score INTEGER,
-        auto BOOLEAN DEFAULT false,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // PLANO DE AÇÃO
-    await sql`
-      CREATE TABLE IF NOT EXISTS plano_acao (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        inventario_id INTEGER REFERENCES inventario(id),
-        acao TEXT NOT NULL,
-        responsavel VARCHAR(255),
-        prazo DATE,
-        prioridade VARCHAR(20),
-        status VARCHAR(30) DEFAULT 'Pendente',
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // CHECKLIST NR-1
-    await sql`
-      CREATE TABLE IF NOT EXISTS checklist (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        item_id VARCHAR(10) NOT NULL,
-        concluido BOOLEAN DEFAULT false,
-        updated_at TIMESTAMPTZ DEFAULT NOW(),
-        UNIQUE(empresa_id, item_id)
-      )
-    `;
-
-    // RELATOS ASSÉDIO SEXUAL (confidencial)
-    await sql`
-      CREATE TABLE IF NOT EXISTS relatos_assedio (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER REFERENCES empresas(id),
-        setor VARCHAR(255),
-        respostas JSONB,
-        identificacao JSONB,
-        visualizado_por JSONB DEFAULT '[]',
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // LOG DE ACESSO (auditoria)
-    await sql`
-      CREATE TABLE IF NOT EXISTS log_acesso (
-        id SERIAL PRIMARY KEY,
-        empresa_id INTEGER,
-        usuario_id INTEGER,
-        perfil VARCHAR(20),
-        acao VARCHAR(100),
-        detalhes JSONB,
-        ip VARCHAR(50),
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `;
-
-    // Empresa padrão se não existir
-    const empresas = await sql`SELECT id FROM empresas LIMIT 1`;
-    if (empresas.length === 0) {
-      await sql`
-        INSERT INTO empresas (nome, cnpj) VALUES ('Minha Empresa', '00.000.000/0000-00')
-      `;
+    // Empresa padrão
+    const emp = await sql`SELECT id FROM empresas WHERE id=1 LIMIT 1`;
+    if (emp.length === 0) {
+      await sql`INSERT INTO empresas (id, nome, cnpj) VALUES (1, 'Minha Empresa', '00.000.000/0000-00') ON CONFLICT DO NOTHING`;
     }
 
-    return new Response(JSON.stringify({ ok: true, message: 'Banco inicializado com sucesso' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Usuários padrão
+    const crypto = require('crypto');
+    const hashRH = crypto.createHash('sha256').update('rh1234gro_nr1_salt_2026').digest('hex');
+    const hashSST = crypto.createHash('sha256').update('sst1234gro_nr1_salt_2026').digest('hex');
+    await sql`INSERT INTO usuarios (empresa_id, nome, perfil, senha_hash) VALUES (1, 'Gestor RH', 'rh', ${hashRH}) ON CONFLICT DO NOTHING`;
+    await sql`INSERT INTO usuarios (empresa_id, nome, perfil, senha_hash) VALUES (1, 'Técnico SST', 'sst', ${hashSST}) ON CONFLICT DO NOTHING`;
 
+    return { statusCode: 200, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ok: true, message: 'Banco inicializado' }) };
   } catch (error) {
-    return new Response(JSON.stringify({ ok: false, error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return { statusCode: 500, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ok: false, error: error.message }) };
   }
 };
-
-export const config = { path: '/api/db-init' };
